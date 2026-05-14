@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { getExchangeRates } from './services/exchangeService';
+import { getBanks } from './services/brasilApiService'; // Nova importação
 
 const app = express();
 app.use(cors());
@@ -9,12 +9,12 @@ app.use(express.json());
 let balance = 1500.50;
 const transactions: any[] = [];
 
-app.get('/api/exchange', async (req, res) => {
+app.get('/api/banks', async (req, res) => {
   try {
-    const rates = await getExchangeRates();
-    res.json({ success: true, rates });
+    const banks = await getBanks();
+    res.json({ success: true, banks });
   } catch (error) {
-    res.status(500).json({ error: 'Erro ao buscar cotações' });
+    res.status(500).json({ error: 'Erro ao buscar instituições financeiras' });
   }
 });
 
@@ -34,7 +34,6 @@ app.post('/api/transactions', (req, res) => {
   };
   
   transactions.push(newTransaction);
-  
   balance += type === 'INCOME' ? amount : -amount;
   
   res.json({ success: true, balance, transaction: newTransaction });
