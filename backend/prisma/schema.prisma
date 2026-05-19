@@ -1,0 +1,134 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                Int       @id @default(autoincrement()) @map("user_id")
+  name              String    @db.VarChar(255)
+  email             String    @unique @db.VarChar(255)
+  passwordHash      String    @map("password_hash") @db.VarChar(255)
+  
+  resetToken        String?   @map("reset_token") @db.VarChar(255)
+  resetTokenExpires DateTime? @map("reset_token_expires")
+  
+  createdAt         DateTime  @default(now()) @map("created_at")
+
+  accounts          Account[]
+  categories        Category[]
+  creditCards       CreditCard[]
+  goals             Goal[]
+  budgets           Budget[]
+
+  @@map("usuario")
+}
+
+model Category {
+  id          Int       @id @default(autoincrement()) @map("category_id")
+  name        String    @db.VarChar(100)
+  type        String    @db.VarChar(20) // INCOME ou EXPENSE
+  icon        String?   @db.VarChar(50)
+  color       String?   @db.VarChar(20)
+  isDefault   Boolean   @default(false) @map("is_default")
+  
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+  budgets      Budget[]
+
+  @@map("categoria")
+}
+
+model Account {
+  id          Int       @id @default(autoincrement()) @map("account_id")
+  name        String    @db.VarChar(100)
+  type        String    @db.VarChar(50)
+  balance     Decimal   @default(0.00) @db.Decimal(15, 2) 
+  currency    String    @default("BRL") @db.VarChar(10)
+  
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@map("conta")
+}
+
+model CreditCard {
+  id          Int       @id @default(autoincrement()) @map("creditcard_id")
+  name        String    @db.VarChar(100)
+  limitAmount Decimal   @map("limit_amount") @db.Decimal(15, 2)
+  closingDay  Int       @map("closing_day")
+  dueDay      Int       @map("due_day")
+  
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@map("cartaocredito")
+}
+
+model Goal {
+  id            Int       @id @default(autoincrement()) @map("goal_id")
+  name          String    @db.VarChar(100)
+  targetAmount  Decimal   @map("target_amount") @db.Decimal(15, 2)
+  currentAmount Decimal   @default(0.00) @map("current_amount") @db.Decimal(15, 2)
+  deadline      DateTime  @db.Date
+  
+  userId        Int       @map("user_id")
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("objetivo")
+}
+
+model Budget {
+  id          Int       @id @default(autoincrement()) @map("budget_id")
+  amountLimit Decimal   @map("amount_limit") @db.Decimal(15, 2)
+  month       Int
+  year        Int
+  
+  userId      Int       @map("user_id")
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  categoryId  Int       @map("category_id")
+  category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@map("orcamento")
+}
+
+model Transaction {
+  id               Int         @id @default(autoincrement()) @map("transaction_id")
+  amount           Decimal     @db.Decimal(15, 2)
+  date             DateTime    @db.Date
+  dueDate          DateTime?   @map("due_date") @db.Date 
+  description      String      @db.Text
+  type             String      @db.VarChar(20) 
+  isCleared        Boolean     @default(false) @map("is_cleared")
+  
+  isRecurring      Boolean     @default(false) @map("is_recurring")
+  recurrencePeriod String?     @map("recurrence_period") @db.VarChar(20)
+
+  accountId        Int?        @map("account_id")
+  account          Account?    @relation(fields: [accountId], references: [id], onDelete: SetNull)
+  
+  categoryId       Int?        @map("category_id")
+  category         Category?   @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  
+  creditCardId     Int?        @map("creditcard_id")
+  creditCard       CreditCard? @relation(fields: [creditCardId], references: [id], onDelete: SetNull)
+  
+  budgetId         Int?        @map("budget_id")
+  budget           Budget?     @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+
+  @@map("transacao")
+}
