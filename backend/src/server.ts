@@ -1,13 +1,12 @@
 import express from 'express';
 import cors from 'cors';
-import { getBanks } from './services/brasilApiService'; // Nova importação
+import { getBanks } from './services/brasilApiService';
+import { transactionRoutes } from './routes/transaction.routes';
 
 const app = express();
+
 app.use(cors());
 app.use(express.json());
-
-let balance = 1500.50;
-const transactions: any[] = [];
 
 app.get('/api/banks', async (req, res) => {
   try {
@@ -18,27 +17,14 @@ app.get('/api/banks', async (req, res) => {
   }
 });
 
+app.use('/api/transactions', transactionRoutes);
+
 app.get('/api/balance', (req, res) => {
-  res.json({ balance });
+  res.json({ balance: 1500.50, warning: "Mock mode - Falta integrar com Account" });
 });
 
-app.post('/api/transactions', (req, res) => {
-  const { amount, description, type } = req.body;
-  
-  const newTransaction = {
-    id: Date.now(),
-    amount,
-    description,
-    type,
-    date: new Date()
-  };
-  
-  transactions.push(newTransaction);
-  balance += type === 'INCOME' ? amount : -amount;
-  
-  res.json({ success: true, balance, transaction: newTransaction });
-});
+const PORT = process.env.PORT || 3001;
 
-app.listen(3001, () => {
-  console.log('Backend do FinanceFlow rodando na porta 3001 (Mock Mode)');
+app.listen(PORT, () => {
+  console.log(`🚀 Backend do FinanceFlow rodando na porta ${PORT} (Conectado ao Neon Database)`);
 });
