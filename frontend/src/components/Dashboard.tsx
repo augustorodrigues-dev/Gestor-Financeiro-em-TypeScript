@@ -6,6 +6,15 @@ export default function Dashboard() {
   const [banks, setBanks] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
 
+  // NOVO: Controle do Modal e do Formulário
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [formData, setFormData] = useState({
+    description: '',
+    amount: '',
+    type: 'EXPENSE',
+    date: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD para o input de data
+  });
+
   useEffect(() => {
     fetch('http://localhost:3001/api/banks')
       .then(res => res.json())
@@ -21,7 +30,7 @@ export default function Dashboard() {
 
     const loadTransactions = async () => {
       try {
-        const data = await transactionService.getTransactions(1); 
+        const data = await transactionService.getTransactions(1);
         setTransactions(data);
       } catch (error) {
         console.error("Erro ao carregar transações", error);
@@ -31,28 +40,43 @@ export default function Dashboard() {
     loadTransactions();
   }, []);
 
-  const handleTestTransaction = async () => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmitTransaction = async (e: React.FormEvent) => {
+    e.preventDefault(); 
+
     const novaTransacao: TransactionData = {
-      amount: 150.50,
-      date: new Date().toISOString(),
-      description: "Compra no supermercado",
-      type: "EXPENSE"
+      description: formData.description,
+      amount: parseFloat(formData.amount),
+      type: formData.type as 'INCOME' | 'EXPENSE' | 'TRANSFER',
+      date: new Date(formData.date).toISOString() 
     };
 
     try {
       const savedTransaction = await transactionService.createTransaction(novaTransacao);
       setTransactions([savedTransaction, ...transactions]);
       
-      setBalance(prevBalance => prevBalance - novaTransacao.amount);
-      alert("Sucesso! Transação gravada no PostgreSQL com Prisma!");
+      const valorAjustado = novaTransacao.type === 'EXPENSE' ? -novaTransacao.amount : novaTransacao.amount;
+      setBalance(prevBalance => prevBalance + valorAjustado);
+      
+      setIsModalOpen(false);
+      setFormData({
+        description: '',
+        amount: '',
+        type: 'EXPENSE',
+        date: new Date().toISOString().split('T')[0]
+      });
+
     } catch (error) {
       alert("Erro ao salvar a transação no banco de dados.");
     }
   };
 
   return (
-    <div className="space-y-6">
-      {}
+    <div className="space-y-6 relative">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         {}
@@ -61,10 +85,10 @@ export default function Dashboard() {
           <h3 className="text-3xl font-bold text-gray-800">R$ {balance.toFixed(2)}</h3>
           
           <button 
-            onClick={handleTestTransaction}
-            className="mt-4 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded transition"
+            onClick={() => setIsModalOpen(true)}
+            className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition font-semibold shadow-sm"
           >
-            - Testar Inserção: Supermercado (R$ 150,50)
+            + Nova Transação
           </button>
         </div>
 
@@ -84,9 +108,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {}
+      {/* Lista de Extrato Real */}
       <div className="bg-white p-6 rounded shadow border-l-4 border-blue-500">
-        <h2 className="text-xl font-bold text-gray-800 mb-4">Extrato Real (PostgreSQL)</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-4">Extrato Real </h2>
         
         {transactions.length === 0 ? (
           <p className="text-gray-500">Ainda não há transações registradas no banco.</p>
@@ -109,7 +133,89 @@ export default function Dashboard() {
           </ul>
         )}
       </div>
-      
+
+      {}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md">
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">Nova Transação</h2>
+            
+            <form onSubmit={handleSubmitTransaction} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <input 
+                  type="text" 
+                  name="description"
+                  required
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Ex: Conta de Luz"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Valor (R$)</label>
+                  <input 
+                    type="number" 
+                    name="amount"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    value={formData.amount}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data</label>
+                  <input 
+                    type="date" 
+                    name="date"
+                    required
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+                <select 
+                  name="type"
+                  value={formData.type}
+                  onChange={handleInputChange}
+                  className="w-full p-2 border border-gray-300 rounded focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="EXPENSE">Despesa</option>
+                  <option value="INCOME">Receita</option>
+                </select>
+              </div>
+
+              <div className="flex justify-end space-x-3 mt-6">
+                <button 
+                  type="button"
+                  onClick={() => setIsModalOpen(false)}
+                  className="px-4 py-2 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition"
+                >
+                  Cancelar
+                </button>
+                <button 
+                  type="submit"
+                  className="px-4 py-2 text-white bg-blue-600 hover:bg-blue-700 rounded transition"
+                >
+                  Salvar Transação
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
