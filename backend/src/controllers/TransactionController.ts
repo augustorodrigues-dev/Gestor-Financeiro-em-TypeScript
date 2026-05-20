@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
-// CORREÇÃO 1: Importar a classe com letra MAIÚSCULA
 import { TransactionService } from '../services/TransactionService';
 
-// CORREÇÃO 2: Instanciar usando a classe correta
 const transactionService = new TransactionService();
 
 export class TransactionController {

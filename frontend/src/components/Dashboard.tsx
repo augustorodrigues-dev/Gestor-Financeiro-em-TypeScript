@@ -6,13 +6,12 @@ export default function Dashboard() {
   const [banks, setBanks] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
 
-  // NOVO: Controle do Modal e do Formulário
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     description: '',
     amount: '',
     type: 'EXPENSE',
-    date: new Date().toISOString().split('T')[0] // Formato YYYY-MM-DD para o input de data
+    date: new Date().toISOString().split('T')[0]
   });
 
   useEffect(() => {
@@ -108,7 +107,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Lista de Extrato Real */}
+      {}
       <div className="bg-white p-6 rounded shadow border-l-4 border-blue-500">
         <h2 className="text-xl font-bold text-gray-800 mb-4">Extrato Real </h2>
         

@@ -3,13 +3,10 @@ import { Pool } from 'pg';
 import { PrismaPg } from '@prisma/adapter-pg';
 import 'dotenv/config';
 
-// 1. Configura a conexão nativa com o PostgreSQL
 const pool = new Pool({ connectionString: process.env.DATABASE_URL as string });
 
-// 2. Cria o adaptador oficial do Prisma
 const adapter = new PrismaPg(pool);
 
-// 3. Passa o adaptador para o PrismaClient (Exatamente o que a mensagem de erro exigiu)
 const prisma = new PrismaClient({ adapter });
 
 interface CreateTransactionDTO {
