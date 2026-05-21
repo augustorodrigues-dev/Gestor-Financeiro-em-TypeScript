@@ -10,5 +10,8 @@ declare var process: {
 export default defineConfig({
   datasource: {
     url: process.env.DATABASE_URL as string,
+  },
+  migrations: {
+    seed: 'ts-node ./src/seed.ts',
   }
 });

@@ -1,36 +1,23 @@
-const API_URL = 'http://localhost:3001/api/transactions';
+// frontend/src/services/transactionService.ts
+const API_URL = 'http://localhost:3001/api';
 
-export interface TransactionData {
-  amount: number;
-  date: string;
-  description: string;
-  type: 'INCOME' | 'EXPENSE' | 'TRANSFER';
-}
+export const getTransactions = async (userId: number) => {
+  const response = await fetch(`${API_URL}/transactions/user/${userId}`);
+  return response.json();
+};
 
-export const transactionService = {
-  getTransactions: async (userId: number = 1) => {
-    try {
-      const response = await fetch(`${API_URL}/user/${userId}`);
-      if (!response.ok) throw new Error('Erro ao buscar transações');
-      return await response.json();
-    } catch (error) {
-      console.error(error);
-      return [];
-    }
-  },
+export const createTransaction = async (data: any) => {
+  const response = await fetch(`${API_URL}/transactions`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Erro ao criar transação');
+  return response.json();
+};
 
-  createTransaction: async (data: TransactionData) => {
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
-      if (!response.ok) throw new Error('Erro ao criar transação');
-      return await response.json();
-    } catch (error) {
-      console.error(error);
-      throw error;
-    }
-  }
+export const deleteTransaction = async (id: number) => {
+  const response = await fetch(`${API_URL}/transactions/${id}`, { method: 'DELETE' });
+  if (!response.ok) throw new Error('Erro ao deletar transação');
+  return response.json();
 };

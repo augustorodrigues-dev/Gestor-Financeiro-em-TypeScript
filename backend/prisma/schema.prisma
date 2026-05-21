@@ -32,7 +32,7 @@ model User {
 model Category {
   id          Int       @id @default(autoincrement()) @map("category_id")
   name        String    @db.VarChar(100)
-  type        String    @db.VarChar(20) // INCOME ou EXPENSE
+  type        String    @db.VarChar(20) 
   icon        String?   @db.VarChar(50)
   color       String?   @db.VarChar(20)
   isDefault   Boolean   @default(false) @map("is_default")
