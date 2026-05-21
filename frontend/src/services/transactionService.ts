@@ -1,4 +1,3 @@
-// frontend/src/services/transactionService.ts
 const API_URL = 'http://localhost:3001/api';
 
 export const getTransactions = async (userId: number) => {
@@ -19,5 +18,15 @@ export const createTransaction = async (data: any) => {
 export const deleteTransaction = async (id: number) => {
   const response = await fetch(`${API_URL}/transactions/${id}`, { method: 'DELETE' });
   if (!response.ok) throw new Error('Erro ao deletar transação');
+  return response.json();
+};
+
+export const updateTransaction = async (id: number, data: any) => {
+  const response = await fetch(`${API_URL}/transactions/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!response.ok) throw new Error('Erro ao atualizar transação');
   return response.json();
 };

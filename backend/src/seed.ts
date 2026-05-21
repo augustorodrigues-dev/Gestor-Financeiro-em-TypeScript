@@ -1,4 +1,3 @@
-// backend/prisma/seed.ts
 import { prisma } from './prisma';
 import bcrypt from 'bcrypt';
 

@@ -1,4 +1,3 @@
-// frontend/src/components/Login.tsx
 import { useState } from 'react';
 
 interface LoginProps {
@@ -41,15 +40,15 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             </button>
           </form>
 
-          {/* ÁREA DE TESTE / USUÁRIOS UNIVERSAIS */}
+          {}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-center text-gray-500 mb-4">Acesso Rápido (Desenvolvimento)</p>
             <div className="flex gap-2">
               <button onClick={() => onLoginSuccess(1, "Usuário Teste 1")} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded text-sm transition-colors">
-                🧑‍💻 Logar como ID 1
+                🧑‍💻 Logar como Jadao o Liso
               </button>
               <button onClick={() => onLoginSuccess(2, "Usuário Teste 2")} className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold py-2 px-4 rounded text-sm transition-colors">
-                👩‍💻 Logar como ID 2
+                👩‍💻 Logar como DevOpsNando
               </button>
             </div>
           </div>
