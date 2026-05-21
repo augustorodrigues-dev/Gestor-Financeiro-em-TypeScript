@@ -1,16 +1,18 @@
-# FinanceFlow 💸
+# FinanceFlow 💸  
 ### Plataforma Web de Gestão Financeira Pessoal
 
-O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e intuitiva. O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da **Brasil API**.
+O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e intuitiva.
 
-O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker e execução simultânea das camadas da aplicação.
+O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br).
+
+O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e execução simultânea das camadas da aplicação.
 
 ---
 
 # ✨ Funcionalidades
 
 - 📊 **Controle de Receitas e Despesas**  
-  Registro detalhado de entradas e saídas financeiras.
+  Registro completo de entradas e saídas financeiras (CRUD de transações).
 
 - 💰 **Saldo Total Dinâmico**  
   Atualização automática baseada no somatório das contas e transações salvas no banco de dados.
@@ -18,52 +20,66 @@ O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utiliza
 - 🏦 **Cadastro de Contas Bancárias**  
   Integração com instituições financeiras reais listadas via Brasil API.
 
+- 🧪 **Testes de Integração Automatizados**  
+  Cobertura de rotas HTTP, validações de erro, persistência e teardown automático.
+
 - 🐳 **Ambiente Isolado com Docker**  
-  Inicialização rápida do PostgreSQL e pgAdmin4 sem necessidade de instalação nativa do banco.
+  Inicialização rápida do PostgreSQL e pgAdmin4 sem necessidade de instalação nativa.
 
 - ⚡ **Execução Unificada**  
-  Script maestro configurado para rodar Front-end e Back-end simultaneamente utilizando um único terminal.
+  Front-end e back-end executados simultaneamente utilizando um único comando.
 
 - 🛠️ **Arquitetura em Camadas**  
-  Separação organizada entre controllers, services e rotas da API.
+  Separação organizada entre rotas, controllers, services e testes.
 
 ---
 
 # 🚀 Tecnologias Utilizadas
 
 ## Front-end
+
 - React 18
 - Vite
 - TypeScript
 - Tailwind CSS
 
 ## Back-end
+
 - Node.js
 - Express
 - TypeScript
 - Prisma ORM
+- `@prisma/client`
 - `@prisma/adapter-pg`
 - `pg`
 
 ## Banco de Dados & Infraestrutura
+
 - PostgreSQL 15
 - Docker
 - Docker Compose
 - pgAdmin4
 
+## Qualidade & Testes
+
+- Jest
+- ts-jest
+- Supertest
+
 ## API Externa
+
 - Brasil API
 
 ---
 
 # 📁 Estrutura do Projeto
 
-O projeto segue uma arquitetura multi-camadas organizada para facilitar manutenção, escalabilidade e separação de responsabilidades.
-
 ```text
 GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │
-├── backend/                          # API REST e Camada de Dados
+├── backend/
+│   │
+│   ├── coverage/
 │   │
 │   ├── prisma/
 │   │   ├── migrations/
@@ -74,29 +90,37 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │   │   └── schema.prisma
 │   │
 │   ├── src/
-│   │   ├── controllers/             # Requisições e respostas HTTP
+│   │   ├── controllers/
 │   │   │   └── TransactionController.ts
 │   │   │
-│   │   ├── routes/                  # Endpoints da API
+│   │   ├── routes/
 │   │   │   └── transaction.routes.ts
 │   │   │
-│   │   ├── services/                # Regras de negócio e integrações
+│   │   ├── services/
 │   │   │   ├── brasilApiService.ts
 │   │   │   └── TransactionService.ts
 │   │   │
-│   │   └── server.ts                # Inicialização do Express
+│   │   └── server.ts
 │   │
+│   ├── tests/
+│   │   └── transactions.integration.test.ts
+│   │
+│   ├── jest.config.ts
 │   ├── package.json
-│   ├── package-lock.json
 │   ├── prisma.config.ts
 │   ├── .env
 │   └── tsconfig.json
 │
-├── frontend/                        # Interface Web React
+├── frontend/
 │   │
 │   ├── src/
-│   │   ├── components/              # Componentes visuais
-│   │   ├── services/                # Comunicação HTTP com a API
+│   │   ├── components/
+│   │   │   ├── Dashboard.tsx
+│   │   │   └── Login.tsx
+│   │   │
+│   │   ├── services/
+│   │   │   └── transactionService.ts
+│   │   │
 │   │   ├── App.tsx
 │   │   ├── main.tsx
 │   │   ├── index.css
@@ -104,13 +128,12 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │   │
 │   ├── index.html
 │   ├── package.json
-│   ├── package-lock.json
 │   ├── postcss.config.js
 │   ├── tailwind.config.js
 │   └── tsconfig.json
 │
-├── docker-compose.yml               # Containers PostgreSQL + pgAdmin4
-├── package.json                     # Script maestro com concurrently
+├── docker-compose.yml
+├── package.json
 ├── .gitignore
 └── README.md
 ```
@@ -121,7 +144,7 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 
 Antes de executar o projeto, certifique-se de possuir instalado:
 
-- Node.js v20+ ou superior
+- Node.js v20+
 - NPM
 - Docker
 - Docker Compose
@@ -135,9 +158,7 @@ Antes de executar o projeto, certifique-se de possuir instalado:
 
 ```bash
 git clone https://github.com/augustorodrigues-dev/Gestor-Financeiro-em-TypeScript.git
-```
 
-```bash
 cd Gestor-Financeiro-em-TypeScript
 ```
 
@@ -145,9 +166,7 @@ cd Gestor-Financeiro-em-TypeScript
 
 ## 2️⃣ Instalar as Dependências
 
-O projeto utiliza dependências separadas entre raiz, backend e frontend.
-
-Execute os comandos abaixo:
+O projeto utiliza ambientes isolados para front-end e back-end.
 
 ```bash
 # Dependências da raiz
@@ -166,18 +185,13 @@ npm install
 
 ## 3️⃣ Subir a Infraestrutura Docker
 
-O projeto utiliza Docker Compose para inicializar:
-
-- PostgreSQL
-- pgAdmin4
-
-Execute o comando abaixo na raiz do projeto:
+Execute na raiz do projeto:
 
 ```bash
 docker compose up -d
 ```
 
-O banco PostgreSQL ficará exposto externamente na porta:
+O PostgreSQL ficará disponível na porta:
 
 ```text
 localhost:5433
@@ -185,7 +199,7 @@ localhost:5433
 
 ---
 
-## 4️⃣ Configurar as Variáveis de Ambiente
+## 4️⃣ Configurar Variáveis de Ambiente
 
 Crie um arquivo `.env` dentro da pasta `backend/`:
 
@@ -197,33 +211,27 @@ DATABASE_URL="postgresql://admin:adminpassword@localhost:5433/financeflow_local"
 
 ## 5️⃣ Executar as Migrations do Prisma
 
-Com os containers rodando, execute:
-
-```bash
-cd backend
-```
+Dentro da pasta `backend/`:
 
 ```bash
 npx prisma generate
-```
 
-```bash
 npx prisma migrate dev --name init_local
 ```
 
 Esses comandos irão:
 
-- gerar os tipos TypeScript do Prisma
-- sincronizar o schema
-- criar as tabelas no PostgreSQL
+- Gerar o Prisma Client
+- Criar as tabelas do banco PostgreSQL
+- Aplicar as migrations automaticamente
 
 ---
 
 # 💻 Como Executar a Aplicação
 
-O projeto utiliza o pacote `concurrently` na raiz para executar Front-end e Back-end simultaneamente.
+O projeto utiliza o pacote `concurrently` para executar front-end e back-end simultaneamente.
 
-Na raiz do projeto, execute:
+Na raiz do projeto:
 
 ```bash
 npm run dev
@@ -231,17 +239,48 @@ npm run dev
 
 ---
 
-## 🌐 Endereços da Aplicação
+# 🌐 Endereços da Aplicação
 
-### 🔵 Back-end
+## 🔵 Back-end (API REST)
+
 ```text
 http://localhost:3001
 ```
 
-### 🔴 Front-end
+## 🔴 Front-end (React Web App)
+
 ```text
 http://localhost:5173
 ```
+
+---
+
+# 🧪 Qualidade de Código & Testes
+
+O back-end conta com uma suíte de testes de integração automatizados utilizando Jest e Supertest.
+
+## Executar Testes + Coverage
+
+Dentro da pasta `backend/`:
+
+```bash
+npm run test:coverage
+```
+
+---
+
+# ✅ Estratégia de Testes
+
+A suíte de testes cobre:
+
+- ✔️ Criação de transações válidas
+- ✔️ Validação de payloads inválidos
+- ✔️ Listagem dinâmica de registros
+- ✔️ Atualização parcial de dados
+- ✔️ Exclusão automatizada (teardown)
+- ✔️ Testes de integração HTTP ponta a ponta
+
+A aplicação mantém uma meta de cobertura superior a **70%** nas principais camadas de negócio.
 
 ---
 
@@ -249,13 +288,13 @@ http://localhost:5173
 
 O pgAdmin4 está disponível para administração visual do banco de dados.
 
-## Acesso
+## 🔐 Acesso
 
 ```text
 http://localhost:5050
 ```
 
-## Credenciais de Login
+## Credenciais
 
 ```text
 E-mail: admin@financeflow.com
@@ -264,16 +303,16 @@ Senha: admin
 
 ---
 
-## Configuração do Servidor no pgAdmin
+## ⚙️ Configuração do Servidor no pgAdmin
 
-Ao acessar o pgAdmin pela primeira vez, registre um novo servidor utilizando os dados abaixo:
+### Aba General
 
-### Aba "General"
 ```text
 Name: FinanceFlow Local
 ```
 
-### Aba "Connection"
+### Aba Connection
+
 ```text
 Host name/address: db
 Port: 5432
@@ -286,63 +325,44 @@ Password: adminpassword
 
 # 🔄 Integração com a Brasil API
 
-O sistema utiliza a **Brasil API** para consultar instituições financeiras reais do Brasil.
+O sistema consome dados da Brasil API para validar instituições financeiras reais durante o cadastro de contas bancárias.
 
-Endpoint utilizado:
+## Endpoint Consumido
 
 ```text
 https://brasilapi.com.br/api/banks/v1
 ```
 
-Essa integração permite que o sistema utilize dados bancários reais durante o cadastro de contas.
+## Objetivo da Integração
+
+- Evitar erros de digitação
+- Utilizar códigos ISPB oficiais
+- Padronizar nomes bancários
+- Garantir consistência dos dados
 
 ---
 
-# 🗄️ Banco de Dados
+# 📌 Diretrizes da Arquitetura
 
-O projeto utiliza:
-
-- PostgreSQL 15
-- Prisma ORM
-- Prisma Migrations
-- Docker Compose
-- pgAdmin4
-
-A arquitetura atual foi preparada para futura migração para ambientes cloud, incluindo suporte ao Neon Database.
-
----
-
-# 📌 Arquitetura Utilizada
-
-O Back-end segue uma arquitetura baseada em separação de responsabilidades:
-
-## Controllers
-Responsáveis por:
-- receber requisições HTTP
-- validar entradas
-- retornar respostas da API
-
-## Services
-Responsáveis por:
-- regras de negócio
-- integrações externas
-- comunicação com Prisma ORM
+O desenvolvimento foi estruturado seguindo separação clara de responsabilidades:
 
 ## Routes
+
+Responsáveis pelo mapeamento dos endpoints HTTP e distribuição das requisições.
+
+## Controllers
+
 Responsáveis por:
-- mapear endpoints da aplicação
-- organizar a estrutura da API REST
 
----
+- Validação inicial
+- Tratamento de exceções
+- Respostas HTTP
+- Intermediação entre requisição e regra de negócio
 
-# 🎯 Objetivo do Projeto
+## Services
 
-O FinanceFlow foi desenvolvido com foco em:
+Responsáveis por:
 
-- aprendizado de arquitetura full stack moderna
-- integração entre React + Node.js
-- utilização profissional de TypeScript
-- utilização de Prisma ORM
-- containerização com Docker
-- consumo de APIs externas
-- organização escalável de projetos
+- Regras de negócio
+- Integração com APIs externas
+- Persistência de dados via Prisma ORM
