@@ -194,7 +194,7 @@ docker compose up -d
 O PostgreSQL ficará disponível na porta:
 
 ```text
-localhost:5433
+http://localhost:5050
 ```
 
 ---
