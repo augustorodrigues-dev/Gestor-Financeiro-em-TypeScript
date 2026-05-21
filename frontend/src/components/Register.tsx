@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { registerUser } from '../services/userService';
 
-interface LoginProps {
-  onLoginSuccess: (userId: number, userName: string) => void;
-  onNavigateToRegister: () => void;
+interface RegisterProps {
+  onNavigateToLogin: () => void;
+  onRegisterSuccess: (userId: number, userName: string) => void;
 }
 
-export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginProps) {
+export default function Register({ onNavigateToLogin, onRegisterSuccess }: RegisterProps) {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,21 +18,25 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
     setLoading(true);
     setError('');
 
-    setTimeout(() => {
-      if (email.includes('@') && password.length >= 4) {
-        onLoginSuccess(1, "Augusto Rodrigues");
-      } else {
-        setError('E-mail ou senha inválidos (Senha mínima de 4 caracteres).');
-        setLoading(false);
+    try {
+      const data = await registerUser({ name, email, password });
+      alert('🎉 Conta criada com sucesso!');
+      
+      if (data.user && data.user.id) {
+        onRegisterSuccess(data.user.id, data.user.name);
       }
-    }, 800);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="flex flex-col justify-center py-6 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          Entrar no FinanceFlow
+          Crie sua conta no FinanceFlow
         </h2>
       </div>
 
@@ -45,13 +51,25 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
+              <label className="block text-sm font-medium text-gray-700">Nome Completo</label>
+              <input
+                type="text"
+                required
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+                placeholder="Augusto Rodrigues"
+              />
+            </div>
+
+            <div>
               <label className="block text-sm font-medium text-gray-700">E-mail</label>
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 placeholder="augusto@exemplo.com"
               />
             </div>
@@ -63,7 +81,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900"
+                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
                 placeholder="********"
               />
             </div>
@@ -71,18 +89,18 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors font-bold"
+              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
             >
-              {loading ? 'Entrando...' : 'Entrar'}
+              {loading ? 'Processando...' : 'Cadastrar e Entrar'}
             </button>
           </form>
 
           <div className="mt-6 text-center">
             <button
-              onClick={onNavigateToRegister}
+              onClick={onNavigateToLogin}
               className="text-sm font-medium text-blue-600 hover:text-blue-500"
             >
-              Não tem uma conta? Cadastre-se aqui
+              Já tem uma conta? Faça login
             </button>
           </div>
 

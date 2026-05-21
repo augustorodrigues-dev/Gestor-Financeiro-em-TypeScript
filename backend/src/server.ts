@@ -2,7 +2,8 @@ import express from 'express';
 import cors from 'cors';
 import { getBanks } from './services/brasilApiService';
 import transactionRoutes from './routes/transaction.routes';
-import accountRoutes from './routes/account.routes'; 
+import accountRoutes from './routes/account.routes';
+import userRoutes from './routes/user.routes'; 
 import { prisma } from './prisma'; 
 
 const app = express();
@@ -20,7 +21,8 @@ app.get('/api/banks', async (req, res) => {
 });
 
 app.use('/api/transactions', transactionRoutes);
-app.use('/api/accounts', accountRoutes); // Plugando o CRUD de contas financeiras
+app.use('/api/accounts', accountRoutes); 
+app.use('/api/users', userRoutes);
 
 app.get('/api/balance/user/:userId', async (req, res) => {
   try {
