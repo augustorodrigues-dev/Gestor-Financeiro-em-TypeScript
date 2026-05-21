@@ -1,15 +1,16 @@
 import { useState } from 'react';
 import Dashboard from './components/Dashboard';
 import Login from './components/Login';
-import Register from './components/Register'; 
+import Register from './components/Register';
+import AdminPanel from './components/AdminPanel'; 
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   
-  const [userSession, setUserSession] = useState<{ id: number; name: string } | null>(null);
+  const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
 
-  const handleAuthSuccess = (id: number, name: string) => {
-    setUserSession({ id, name });
+  const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
+    setUserSession({ id, name, role });
   };
 
   const handleLogout = () => {
@@ -19,13 +20,18 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-100 font-sans">
-      {}
       <nav className="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
         <h1 className="text-xl font-bold tracking-wide">FinanceFlow 💸</h1>
         {userSession && (
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-90">
               Olá, <strong>{userSession.name}</strong>
+              {}
+              {userSession.role === 'ADMIN' && (
+                <span className="ml-2 bg-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                  Admin
+                </span>
+              )}
             </span>
             <button 
               onClick={handleLogout}
@@ -37,10 +43,13 @@ export default function App() {
         )}
       </nav>
 
-      {}
       <main className="p-8">
         {userSession ? (
-          <Dashboard userId={userSession.id} />
+          userSession.role === 'ADMIN' ? (
+            <AdminPanel />
+          ) : (
+            <Dashboard userId={userSession.id} />
+          )
         ) : authMode === 'login' ? (
           <Login 
             onLoginSuccess={handleAuthSuccess} 

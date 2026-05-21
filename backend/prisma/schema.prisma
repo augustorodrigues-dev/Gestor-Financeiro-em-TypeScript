@@ -9,11 +9,17 @@ datasource db {
   provider = "postgresql"
 }
 
+enum Role {
+  USER
+  ADMIN
+}
+
 model User {
   id                Int       @id @default(autoincrement()) @map("user_id")
   name              String    @db.VarChar(255)
   email             String    @unique @db.VarChar(255)
   passwordHash      String    @map("password_hash") @db.VarChar(255)
+  role         Role          @default(USER)
   
   resetToken        String?   @map("reset_token") @db.VarChar(255)
   resetTokenExpires DateTime? @map("reset_token_expires")

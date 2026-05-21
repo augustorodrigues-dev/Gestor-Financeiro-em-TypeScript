@@ -1,38 +1,51 @@
-import { prisma } from '../prisma';
+import { prisma } from '../prisma'; 
 import bcrypt from 'bcrypt';
 
-interface CreateUserDTO {
+export interface CreateUserDTO {
   name: string;
   email: string;
-  password: string; // O DTO continua recebendo 'password' do front-end
+  password?: string; 
+  role?: 'USER' | 'ADMIN'; 
 }
 
 export class UserService {
+  
   async createUser(data: CreateUserDTO) {
-    // 1. Verifica se o e-mail já está em uso
-    const emailJaExiste = await prisma.user.findUnique({
+    const userExists = await prisma.user.findUnique({
       where: { email: data.email }
     });
 
-    if (emailJaExiste) {
+    if (userExists) {
       throw new Error("Este e-mail já está cadastrado no sistema.");
     }
 
-    // 2. Encripta a senha com bcrypt
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    const passwordHash = data.password ? await bcrypt.hash(data.password, 10) : '';
 
-    // 3. Salva no banco usando 'passwordHash' (o nome correto do seu schema!)
-    const novoUsuario = await prisma.user.create({
+    return await prisma.user.create({
       data: {
         name: data.name,
         email: data.email,
-        passwordHash: hashedPassword, // Alterado de password para passwordHash
+        passwordHash: passwordHash,
+        role: data.role || 'USER' 
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
       }
     });
+  }
 
-    // Remove o hash de senha do objeto de retorno por segurança antes de mandar pro front
-    const { passwordHash, ...usuarioSemSenha } = novoUsuario;
-    return usuarioSemSenha;
+  async getAllUsers() {
+    return await prisma.user.findMany({
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true,
+        createdAt: true
+      }
+    });
   }
 }

@@ -11,11 +11,12 @@ async function main() {
 
   console.log('🌱 Semeando os dados...');
 
-    const jadao = await prisma.user.create({
+  const jadao = await prisma.user.create({
     data: {
       name: 'Jadão o Liso',
       email: 'jadao@gmail.com',
       passwordHash: passwordHash,
+      role: 'USER', 
       accounts: {
         create: {
           name: 'Banco Inter',
@@ -31,14 +32,21 @@ async function main() {
           }
         }
       }
-    },
-    include: { accounts: { include: { transactions: true } } }
+    }
   });
 
-  const jadaoAcc = jadao.accounts[0];
-  const jadaoBalance = jadaoAcc.transactions.reduce(
-   (acc, tx) => (tx.type === 'INCOME' ? acc + Number(tx.amount) : acc - Number(tx.amount)), 0);
-   await prisma.account.update({ where: { id: jadaoAcc.id }, data: { balance: jadaoBalance } });
+  const jadaoAcc = await prisma.account.findFirst({
+    where: { userId: jadao.id },
+    include: { transactions: true }
+  });
+
+  if (jadaoAcc) {
+    const jadaoBalance = jadaoAcc.transactions.reduce(
+      (acc: number, tx: any) => (tx.type === 'INCOME' ? acc + Number(tx.amount) : acc - Number(tx.amount)), 
+      0
+    );
+    await prisma.account.update({ where: { id: jadaoAcc.id }, data: { balance: jadaoBalance } });
+  }
 
 
   const nando = await prisma.user.create({
@@ -46,6 +54,7 @@ async function main() {
       name: 'DevOps Nando',
       email: 'nando@gmail.com',
       passwordHash: passwordHash,
+      role: 'USER', 
       accounts: {
         create: {
           name: 'Nubank',
@@ -62,17 +71,34 @@ async function main() {
           }
         }
       }
-    },
-    include: { accounts: { include: { transactions: true } } }
+    }
   });
 
-  const nandoAcc = nando.accounts[0];
-  const nandoBalance = nandoAcc.transactions.reduce(
-  (acc, tx) => (tx.type === 'INCOME' ? acc + Number(tx.amount) : acc - Number(tx.amount)), 
-  0
-);
-await prisma.account.update({ where: { id: nandoAcc.id }, data: { balance: nandoBalance } });
-  console.log('✅ Banco de dados populado com sucesso com Jadão e DevOpsNando!');
+  const nandoAcc = await prisma.account.findFirst({
+    where: { userId: nando.id },
+    include: { transactions: true }
+  });
+
+  if (nandoAcc) {
+    const nandoBalance = nandoAcc.transactions.reduce(
+      (acc: number, tx: any) => (tx.type === 'INCOME' ? acc + Number(tx.amount) : acc - Number(tx.amount)), 
+      0
+    );
+    await prisma.account.update({ where: { id: nandoAcc.id }, data: { balance: nandoBalance } });
+  }
+
+
+  console.log('👑 Criando administradora Alexandra...');
+  await prisma.user.create({
+    data: {
+      name: 'Alexandra Bargan',
+      email: 'alexandra@gmail.com',
+      passwordHash: passwordHash,
+      role: 'ADMIN' 
+    }
+  });
+
+  console.log('✅ Banco de dados populado com sucesso com Jadão, DevOpsNando e Alexandra!');
 }
 
 main()
