@@ -38,4 +38,30 @@ export class UserController {
       return res.status(500).json({ error: "Erro interno ao listar usuários." });
     }
   }
+  async update(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      const { name, role } = req.body;
+
+      if (!name || !role) {
+        return res.status(400).json({ error: "Nome e Role são obrigatórios." });
+      }
+
+      const updatedUser = await userService.updateUser(Number(id), { name, role });
+      return res.json({ message: "Usuário atualizado com sucesso!", updatedUser });
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro interno ao atualizar usuário." });
+    }
+  }
+
+  // 🗑️ DELETE DO CRUD
+  async delete(req: Request, res: Response) {
+    try {
+      const { id } = req.params;
+      await userService.deleteUser(Number(id));
+      return res.json({ message: "Usuário excluído com sucesso!" });
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro interno ao excluir usuário." });
+    }
+  }
 }

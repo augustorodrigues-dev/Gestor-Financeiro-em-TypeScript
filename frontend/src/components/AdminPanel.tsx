@@ -85,6 +85,25 @@ export default function AdminPanel() {
     }
   };
 
+  const handleDeleteUser = async (id: number, name: string) => {
+    if (id === 3) return alert("Acesso negado: Você não pode excluir a conta da administradora principal!"); 
+    
+    if (!window.confirm(`Tem certeza absoluta que deseja banir o usuário "${name}"? Todas as contas e transações dele sumirão para sempre.`)) return;
+
+    try {
+      const response = await fetch(`http://localhost:3001/api/users/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) throw new Error('Erro ao excluir usuário.');
+
+      alert('🗑️ Usuário removido do sistema!');
+      loadUsers(); 
+    } catch (error: any) {
+      alert(error.message);
+    }
+  };
+
   if (loading) return <div className="p-8 text-center text-gray-500">Carregando painel de controle...</div>;
 
   return (
@@ -127,7 +146,9 @@ export default function AdminPanel() {
           </div>
           <ul className="divide-y divide-gray-200">
             {users.map(u => (
-              <li key={u.id} className="p-4 flex justify-between items-center bg-white transition-colors">
+              <li key={u.id} className="p-4 flex justify-between items-center bg-white transition-colors group">
+                
+                {}
                 {editingUserId === u.id ? (
                   <div className="flex gap-2 w-full items-center justify-between">
                     <div className="flex gap-2 flex-1 mr-4">
@@ -143,6 +164,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
                 ) : (
+                  
                   <>
                     <div className="flex flex-col">
                       <span className="font-semibold text-gray-900 flex items-center gap-2">
@@ -153,16 +175,28 @@ export default function AdminPanel() {
                       </span>
                       <span className="text-xs text-gray-500 mt-0.5">{u.email}</span>
                     </div>
-                    <button 
-                      onClick={() => {
-                        setEditingUserId(u.id);
-                        setEditName(u.name);
-                        setEditRole(u.role);
-                      }} 
-                      className="text-blue-600 hover:text-blue-800 text-sm font-semibold p-2 rounded hover:bg-blue-50 transition"
-                    >
-                      Editar ✏️
-                    </button>
+                    
+                    {}
+                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button 
+                        onClick={() => {
+                          setEditingUserId(u.id);
+                          setEditName(u.name);
+                          setEditRole(u.role);
+                        }} 
+                        className="text-blue-600 hover:text-blue-800 text-sm font-semibold p-1.5 rounded hover:bg-blue-50 transition"
+                        title="Editar Nome/Role"
+                      >
+                        ✏️
+                      </button>
+                      <button 
+                        onClick={() => handleDeleteUser(u.id, u.name)}
+                        className="text-red-500 hover:text-red-700 text-sm font-semibold p-1.5 rounded hover:bg-red-50 transition"
+                        title="Excluir Usuário"
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </>
                 )}
               </li>

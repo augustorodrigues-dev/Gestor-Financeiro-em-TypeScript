@@ -48,4 +48,34 @@ export class UserService {
       }
     });
   }
+
+  async updateUser(id: number, data: { name: string; role: 'USER' | 'ADMIN' }) {
+    return await prisma.user.update({
+      where: { id },
+      data: {
+        name: data.name,
+        role: data.role
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        role: true
+      }
+    });
+  }
+
+  async deleteUser(id: number) {
+    await prisma.transaction.deleteMany({
+      where: { account: { userId: id } }
+    });
+    
+    await prisma.account.deleteMany({
+      where: { userId: id }
+    });
+
+    return await prisma.user.delete({
+      where: { id }
+    });
+  }
 }
