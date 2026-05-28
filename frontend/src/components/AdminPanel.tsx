@@ -3,10 +3,10 @@ import { useState, useEffect } from 'react';
 export default function AdminPanel() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [adminName, setAdminName] = useState('');
   const [adminEmail, setAdminEmail] = useState('');
-  const [adminPassword, setAdminPassword] = useState(''); 
+  const [adminPassword, setAdminPassword] = useState('');
 
   const [editingUserId, setEditingUserId] = useState<number | null>(null);
   const [editName, setEditName] = useState('');
@@ -15,7 +15,7 @@ export default function AdminPanel() {
   const loadUsers = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3001/api/users'); 
+      const response = await fetch('http://localhost:3001/api/users');
       if (!response.ok) throw new Error();
       const data = await response.json();
       setUsers(data);
@@ -42,7 +42,7 @@ export default function AdminPanel() {
           name: adminName,
           email: adminEmail,
           password: adminPassword,
-          role: 'ADMIN' 
+          role: 'ADMIN'
         })
       });
 
@@ -53,12 +53,12 @@ export default function AdminPanel() {
       }
 
       alert(`👑 Administrador(a) "${adminName}" cadastrado(a) com sucesso no sistema!`);
-      
+
       setAdminName('');
       setAdminEmail('');
       setAdminPassword('');
-      
-      loadUsers(); 
+
+      loadUsers();
     } catch (error: any) {
       alert(error.message);
     }
@@ -86,8 +86,8 @@ export default function AdminPanel() {
   };
 
   const handleDeleteUser = async (id: number, name: string) => {
-    if (id === 3) return alert("Acesso negado: Você não pode excluir a conta da administradora principal!"); 
-    
+    if (id === 3) return alert("Acesso negado: Você não pode excluir a conta da administradora principal!");
+
     if (!window.confirm(`Tem certeza absoluta que deseja banir o usuário "${name}"? Todas as contas e transações dele sumirão para sempre.`)) return;
 
     try {
@@ -98,100 +98,109 @@ export default function AdminPanel() {
       if (!response.ok) throw new Error('Erro ao excluir usuário.');
 
       alert('🗑️ Usuário removido do sistema!');
-      loadUsers(); 
+      loadUsers();
     } catch (error: any) {
       alert(error.message);
     }
   };
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Carregando painel de controle...</div>;
+  if (loading) return (
+    <div className="flex flex-col items-center justify-center gap-3 p-12 text-center text-neutral-500">
+      <div className="h-8 w-8 animate-spin-slow rounded-full border-2 border-neutral-200 border-t-danger-500" aria-hidden="true" />
+      <span className="animate-pulse-soft">Carregando painel de controle...</span>
+    </div>
+  );
 
   return (
-    <div className="max-w-5xl mx-auto space-y-6 p-4">
-      
+    <div className="mx-auto max-w-5xl space-y-6 p-4 animate-fade-in">
+
       {}
-      <div className="bg-red-600 rounded-lg shadow-lg p-6 text-white">
-        <h1 className="text-2xl font-bold">👑 Painel de Administração Geral</h1>
-        <p className="text-red-100 text-sm mt-1">Bem-vinda, Alexandra. Aqui você pode criar novos administradores e gerenciar os privilégios das contas.</p>
+      <div className="rounded-xl2 bg-gradient-danger p-6 text-white shadow-soft animate-fade-in-down sm:p-8">
+        <h1 className="text-2xl font-bold text-shadow-sm sm:text-3xl">👑 Painel de Administração Geral</h1>
+        <p className="mt-1.5 text-sm text-danger-100">Bem-vinda, Alexandra. Aqui você pode criar novos administradores e gerenciar os privilégios das contas.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+
         {}
-        <div className="bg-white p-5 rounded-lg shadow shadow-red-100 border border-gray-200 h-fit">
-          <h3 className="font-bold text-gray-800 mb-4 text-base border-b pb-2 border-gray-100">Criar Novo Administrador</h3>
+        <div className="h-fit rounded-xl border border-neutral-200 bg-white p-5 shadow-card">
+          <h3 className="mb-4 border-b border-neutral-100 pb-2 text-base font-bold text-neutral-800">Criar Novo Administrador</h3>
           <form onSubmit={handleCreateAdmin} className="space-y-3">
             <div>
-              <label className="text-xs text-gray-500 font-medium block mb-1">Nome Completo</label>
-              <input required type="text" placeholder="Ex: Roberto Carlos" value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full border p-2 rounded text-sm outline-none focus:border-red-500 text-gray-900" />
+              <label htmlFor="admin-name" className="mb-1 block text-xs font-medium text-neutral-500">Nome Completo</label>
+              <input id="admin-name" required type="text" placeholder="Ex: Roberto Carlos" value={adminName} onChange={e => setAdminName(e.target.value)} className="w-full rounded-lg border border-neutral-300 p-2.5 text-sm text-neutral-900 placeholder-neutral-400 outline-none transition-colors duration-200 focus:border-danger-500 focus:ring-2 focus:ring-danger-500/30" />
             </div>
             <div>
-              <label className="text-xs text-gray-500 font-medium block mb-1">E-mail de Acesso</label>
-              <input required type="email" placeholder="nome@financeflow.com" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} className="w-full border p-2 rounded text-sm outline-none focus:border-red-500 text-gray-900" />
+              <label htmlFor="admin-email" className="mb-1 block text-xs font-medium text-neutral-500">E-mail de Acesso</label>
+              <input id="admin-email" required type="email" placeholder="nome@financeflow.com" value={adminEmail} onChange={e => setAdminEmail(e.target.value)} className="w-full rounded-lg border border-neutral-300 p-2.5 text-sm text-neutral-900 placeholder-neutral-400 outline-none transition-colors duration-200 focus:border-danger-500 focus:ring-2 focus:ring-danger-500/30" />
             </div>
             <div>
-              <label className="text-xs text-gray-500 font-medium block mb-1">Senha Inicial</label>
-              <input required type="password" placeholder="Mínimo 4 caracteres" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} className="w-full border p-2 rounded text-sm outline-none focus:border-red-500 text-gray-900" />
+              <label htmlFor="admin-password" className="mb-1 block text-xs font-medium text-neutral-500">Senha Inicial</label>
+              <input id="admin-password" required type="password" placeholder="Mínimo 4 caracteres" value={adminPassword} onChange={e => setAdminPassword(e.target.value)} className="w-full rounded-lg border border-neutral-300 p-2.5 text-sm text-neutral-900 placeholder-neutral-400 outline-none transition-colors duration-200 focus:border-danger-500 focus:ring-2 focus:ring-danger-500/30" />
             </div>
-            <button type="submit" className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 rounded text-sm transition shadow-md shadow-red-200 mt-2">
+            <button type="submit" className="mt-2 w-full rounded-lg bg-danger-600 py-2.5 text-sm font-bold text-white shadow-sm shadow-danger-200 transition-all duration-200 hover:bg-danger-700 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500 focus-visible:ring-offset-2">
               🚀 Cadastrar Administrador
             </button>
           </form>
         </div>
 
         {}
-        <div className="md:col-span-2 bg-white rounded-lg shadow border border-gray-200">
-          <div className="p-5 border-b border-gray-200">
-            <h3 className="font-bold text-gray-800">Controle de Usuários e Níveis de Acesso</h3>
+        <div className="rounded-xl border border-neutral-200 bg-white shadow-card md:col-span-2">
+          <div className="border-b border-neutral-200 p-5">
+            <h3 className="font-bold text-neutral-800">Controle de Usuários e Níveis de Acesso</h3>
           </div>
-          <ul className="divide-y divide-gray-200">
+          <ul className="divide-y divide-neutral-200">
             {users.map(u => (
-              <li key={u.id} className="p-4 flex justify-between items-center bg-white transition-colors group">
-                
+              <li key={u.id} className="group flex items-center justify-between bg-white p-4 transition-colors hover:bg-neutral-50">
+
                 {}
                 {editingUserId === u.id ? (
-                  <div className="flex gap-2 w-full items-center justify-between">
-                    <div className="flex gap-2 flex-1 mr-4">
-                      <input type="text" value={editName} onChange={e => setEditName(e.target.value)} className="border p-2 rounded text-sm text-gray-900 w-2/3 outline-none focus:border-blue-500" />
-                      <select value={editRole} onChange={e => setEditRole(e.target.value)} className="border p-2 rounded text-sm text-gray-900 w-1/3 outline-none focus:border-blue-500 font-semibold">
+                  <div className="flex w-full flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex flex-1 gap-2 sm:mr-4">
+                      <input type="text" value={editName} onChange={e => setEditName(e.target.value)} aria-label="Nome do usuário" className="w-2/3 rounded-lg border border-neutral-300 p-2 text-sm text-neutral-900 outline-none transition-colors duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30" />
+                      <select value={editRole} onChange={e => setEditRole(e.target.value)} aria-label="Nível de acesso" className="w-1/3 rounded-lg border border-neutral-300 p-2 text-sm font-semibold text-neutral-900 outline-none transition-colors duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30">
                         <option value="USER">USER</option>
                         <option value="ADMIN">ADMIN</option>
                       </select>
                     </div>
                     <div className="flex gap-2">
-                      <button onClick={() => handleSaveUpdate(u.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded text-xs font-bold transition">Salvar</button>
-                      <button onClick={() => setEditingUserId(null)} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-3 py-2 rounded text-xs transition">Cancelar</button>
+                      <button type="button" onClick={() => handleSaveUpdate(u.id)} className="rounded-lg bg-success-600 px-3 py-2 text-xs font-bold text-white transition-colors hover:bg-success-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-success-500 focus-visible:ring-offset-2">Salvar</button>
+                      <button type="button" onClick={() => setEditingUserId(null)} className="rounded-lg bg-neutral-200 px-3 py-2 text-xs text-neutral-700 transition-colors hover:bg-neutral-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 focus-visible:ring-offset-2">Cancelar</button>
                     </div>
                   </div>
                 ) : (
-                  
+
                   <>
                     <div className="flex flex-col">
-                      <span className="font-semibold text-gray-900 flex items-center gap-2">
+                      <span className="flex items-center gap-2 font-semibold text-neutral-900">
                         {u.name}
-                        <span className={`text-[10px] px-2 py-0.5 rounded font-bold uppercase tracking-wider ${u.role === 'ADMIN' ? 'bg-red-100 text-red-700 border border-red-200' : 'bg-slate-100 text-slate-700 border border-slate-200'}`}>
+                        <span className={`rounded px-2 py-0.5 text-2xs font-bold uppercase tracking-wider ${u.role === 'ADMIN' ? 'border border-danger-200 bg-danger-100 text-danger-700' : 'border border-neutral-200 bg-neutral-100 text-neutral-700'}`}>
                           {u.role}
                         </span>
                       </span>
-                      <span className="text-xs text-gray-500 mt-0.5">{u.email}</span>
+                      <span className="mt-0.5 text-xs text-neutral-500">{u.email}</span>
                     </div>
-                    
+
                     {}
-                    <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button 
+                    <div className="flex gap-1 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
+                      <button
+                        type="button"
                         onClick={() => {
                           setEditingUserId(u.id);
                           setEditName(u.name);
                           setEditRole(u.role);
-                        }} 
-                        className="text-blue-600 hover:text-blue-800 text-sm font-semibold p-1.5 rounded hover:bg-blue-50 transition"
+                        }}
+                        className="rounded p-1.5 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-50 hover:text-brand-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+                        aria-label={`Editar ${u.name}`}
                         title="Editar Nome/Role"
                       >
                         ✏️
                       </button>
-                      <button 
+                      <button
+                        type="button"
                         onClick={() => handleDeleteUser(u.id, u.name)}
-                        className="text-red-500 hover:text-red-700 text-sm font-semibold p-1.5 rounded hover:bg-red-50 transition"
+                        className="rounded p-1.5 text-sm font-semibold text-danger-500 transition-colors hover:bg-danger-50 hover:text-danger-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500"
+                        aria-label={`Excluir ${u.name}`}
                         title="Excluir Usuário"
                       >
                         🗑️
