@@ -1,36 +1,40 @@
-# FinanceFlow 💸  
+# FinanceFlow 💸
+
 ### Plataforma Web de Gestão Financeira Pessoal
 
-O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e intuitiva.
+O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e segura.
 
-O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br).
+O sistema permite criar contas de usuário, registrar transações financeiras, visualizar um saldo dinâmico (com recálculo automatizado via transações ACID) e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br).
 
-O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e execução simultânea das camadas da aplicação.
+O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e segurança de ponta a ponta com JSON Web Tokens (JWT).
 
 ---
 
 # ✨ Funcionalidades
 
-- 📊 **Controle de Receitas e Despesas**  
-  Registro completo de entradas e saídas financeiras (CRUD de transações).
+* 🔐 **Autenticação e Segurança (JWT)**
+  Login e Registro de usuários com senhas criptografadas (Bcrypt). Todas as rotas da API são protegidas e o isolamento de dados por usuário é garantido pelo Token.
 
-- 💰 **Saldo Total Dinâmico**  
-  Atualização automática baseada no somatório das contas e transações salvas no banco de dados.
+* 👥 **Gestão de Sessões e Perfis**
+  Separação de permissões entre usuários comuns e administradores (Admin Panel), além de controle de encerramento de sessão seguro.
 
-- 🏦 **Cadastro de Contas Bancárias**  
-  Integração com instituições financeiras reais listadas via Brasil API.
+* 📊 **Controle de Receitas e Despesas**
+  Registro completo de entradas e saídas financeiras (CRUD completo de transações integrado ao banco de dados).
 
-- 🧪 **Testes de Integração Automatizados**  
+* 💰 **Saldo Total Dinâmico e Seguro**
+  Atualização automática do saldo das contas utilizando operações transacionais ACID (`prisma.$transaction`), garantindo consistência matemática entre as tabelas.
+
+* 🏦 **Cadastro de Contas Bancárias**
+  Integração com instituições financeiras reais listadas via Brasil API, com regras de negócio que impedem a exclusão de contas com histórico ativo.
+
+* 🧪 **Testes de Integração Automatizados**
   Cobertura de rotas HTTP, validações de erro, persistência e teardown automático.
 
-- 🐳 **Ambiente Isolado com Docker**  
+* 🐳 **Ambiente Isolado com Docker**
   Inicialização rápida do PostgreSQL e pgAdmin4 sem necessidade de instalação nativa.
 
-- ⚡ **Execução Unificada**  
+* ⚡ **Execução Unificada**
   Front-end e back-end executados simultaneamente utilizando um único comando.
-
-- 🛠️ **Arquitetura em Camadas**  
-  Separação organizada entre rotas, controllers, services e testes.
 
 ---
 
@@ -38,37 +42,36 @@ O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utiliza
 
 ## Front-end
 
-- React 18
-- Vite
-- TypeScript
-- Tailwind CSS
+* React 18
+* Vite
+* TypeScript
+* Tailwind CSS
 
 ## Back-end
 
-- Node.js
-- Express
-- TypeScript
-- Prisma ORM
-- `@prisma/client`
-- `@prisma/adapter-pg`
-- `pg`
+* Node.js
+* Express
+* TypeScript
+* Prisma ORM (`@prisma/client`, `@prisma/adapter-pg`)
+* PostgreSQL (`pg`)
+* JSON Web Token (JWT)
+* Bcryptjs
 
 ## Banco de Dados & Infraestrutura
 
-- PostgreSQL 15
-- Docker
-- Docker Compose
-- pgAdmin4
+* PostgreSQL 15
+* Docker & Docker Compose
+* pgAdmin4
 
 ## Qualidade & Testes
 
-- Jest
-- ts-jest
-- Supertest
+* Jest
+* ts-jest
+* Supertest
 
 ## API Externa
 
-- Brasil API
+* Brasil API (Instituições Bancárias)
 
 ---
 
@@ -78,63 +81,46 @@ O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utiliza
 GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │
 ├── backend/
-│   │
-│   ├── coverage/
-│   │
 │   ├── prisma/
-│   │   ├── migrations/
-│   │   │   └── 20260519170358_init_financeflow_db/
-│   │   │       └── migration.sql
-│   │   │
-│   │   ├── migration_lock.toml
 │   │   └── schema.prisma
-│   │
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   ├── AuthController.ts
+│   │   │   ├── AccountController.ts
 │   │   │   └── TransactionController.ts
-│   │   │
+│   │   ├── middlewares/
+│   │   │   └── authMiddleware.ts
 │   │   ├── routes/
+│   │   │   ├── auth.routes.ts
+│   │   │   ├── account.routes.ts
 │   │   │   └── transaction.routes.ts
-│   │   │
 │   │   ├── services/
-│   │   │   ├── brasilApiService.ts
+│   │   │   ├── AuthService.ts
+│   │   │   ├── AccountService.ts
 │   │   │   └── TransactionService.ts
-│   │   │
 │   │   └── server.ts
-│   │
 │   ├── tests/
-│   │   └── transactions.integration.test.ts
-│   │
-│   ├── jest.config.ts
 │   ├── package.json
-│   ├── prisma.config.ts
-│   ├── .env
-│   └── tsconfig.json
+│   └── .env
 │
 ├── frontend/
-│   │
 │   ├── src/
 │   │   ├── components/
+│   │   │   ├── AdminPanel.tsx
 │   │   │   ├── Dashboard.tsx
-│   │   │   └── Login.tsx
-│   │   │
+│   │   │   ├── AccountManager.tsx
+│   │   │   ├── Login.tsx
+│   │   │   └── Register.tsx
 │   │   ├── services/
+│   │   │   ├── authService.ts
+│   │   │   ├── accountService.ts
 │   │   │   └── transactionService.ts
-│   │   │
-│   │   ├── App.tsx
-│   │   ├── main.tsx
-│   │   ├── index.css
-│   │   └── vite-env.d.ts
-│   │
-│   ├── index.html
+│   │   └── App.tsx
 │   ├── package.json
-│   ├── postcss.config.js
-│   ├── tailwind.config.js
-│   └── tsconfig.json
+│   └── tailwind.config.js
 │
 ├── docker-compose.yml
 ├── package.json
-├── .gitignore
 └── README.md
 ```
 
@@ -144,11 +130,11 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 
 Antes de executar o projeto, certifique-se de possuir instalado:
 
-- Node.js v20+
-- NPM
-- Docker
-- Docker Compose
-- Git
+* Node.js v20+
+* NPM
+* Docker
+* Docker Compose
+* Git
 
 ---
 
@@ -166,7 +152,7 @@ cd Gestor-Financeiro-em-TypeScript
 
 ## 2️⃣ Instalar as Dependências
 
-O projeto utiliza ambientes isolados para front-end e back-end.
+O projeto utiliza ambientes isolados para front-end e back-end, integrados na raiz.
 
 ```bash
 # Dependências da raiz
@@ -191,12 +177,6 @@ Execute na raiz do projeto:
 docker compose up -d
 ```
 
-O PostgreSQL ficará disponível na porta:
-
-```text
-http://localhost:5050
-```
-
 ---
 
 ## 4️⃣ Configurar Variáveis de Ambiente
@@ -205,6 +185,8 @@ Crie um arquivo `.env` dentro da pasta `backend/`:
 
 ```env
 DATABASE_URL="postgresql://admin:adminpassword@localhost:5433/financeflow_local"
+
+JWT_SECRET="sua_chave_secreta_aqui"
 ```
 
 ---
@@ -219,19 +201,13 @@ npx prisma generate
 npx prisma migrate dev --name init_local
 ```
 
-Esses comandos irão:
-
-- Gerar o Prisma Client
-- Criar as tabelas do banco PostgreSQL
-- Aplicar as migrations automaticamente
-
 ---
 
 # 💻 Como Executar a Aplicação
 
 O projeto utiliza o pacote `concurrently` para executar front-end e back-end simultaneamente.
 
-Na raiz do projeto:
+Na raiz do projeto, execute:
 
 ```bash
 npm run dev
@@ -241,17 +217,9 @@ npm run dev
 
 # 🌐 Endereços da Aplicação
 
-## 🔵 Back-end (API REST)
-
-```text
-http://localhost:3001
-```
-
-## 🔴 Front-end (React Web App)
-
-```text
-http://localhost:5173
-```
+* **Back-end (API REST):** http://localhost:3001
+* **Front-end (React Web App):** http://localhost:5173
+* **Banco de Dados (pgAdmin4):** http://localhost:5050
 
 ---
 
@@ -259,67 +227,13 @@ http://localhost:5173
 
 O back-end conta com uma suíte de testes de integração automatizados utilizando Jest e Supertest.
 
-## Executar Testes + Coverage
-
-Dentro da pasta `backend/`:
+Para executar os testes com verificação de cobertura (dentro da pasta `backend/`):
 
 ```bash
 npm run test:coverage
 ```
 
----
-
-# ✅ Estratégia de Testes
-
-A suíte de testes cobre:
-
-- ✔️ Criação de transações válidas
-- ✔️ Validação de payloads inválidos
-- ✔️ Listagem dinâmica de registros
-- ✔️ Atualização parcial de dados
-- ✔️ Exclusão automatizada (teardown)
-- ✔️ Testes de integração HTTP ponta a ponta
-
-A aplicação mantém uma meta de cobertura superior a **70%** nas principais camadas de negócio.
-
----
-
-# 📊 Gerenciamento Visual com pgAdmin4
-
-O pgAdmin4 está disponível para administração visual do banco de dados.
-
-## 🔐 Acesso
-
-```text
-http://localhost:5050
-```
-
-## Credenciais
-
-```text
-E-mail: admin@financeflow.com
-Senha: admin
-```
-
----
-
-## ⚙️ Configuração do Servidor no pgAdmin
-
-### Aba General
-
-```text
-Name: FinanceFlow Local
-```
-
-### Aba Connection
-
-```text
-Host name/address: db
-Port: 5432
-Maintenance database: financeflow_local
-Username: admin
-Password: adminpassword
-```
+A aplicação mantém uma meta de cobertura superior a 70% nas principais camadas de negócio, validando payloads, autenticação e restrições estruturais.
 
 ---
 
@@ -327,18 +241,11 @@ Password: adminpassword
 
 O sistema consome dados da Brasil API para validar instituições financeiras reais durante o cadastro de contas bancárias.
 
-## Endpoint Consumido
+* **Endpoint Consumido:**
+  `https://brasilapi.com.br/api/banks/v1`
 
-```text
-https://brasilapi.com.br/api/banks/v1
-```
-
-## Objetivo da Integração
-
-- Evitar erros de digitação
-- Utilizar códigos ISPB oficiais
-- Padronizar nomes bancários
-- Garantir consistência dos dados
+* **Objetivo:**
+  Evitar erros de digitação, utilizar códigos ISPB oficiais e padronizar nomes bancários, enriquecendo a experiência do usuário.
 
 ---
 
@@ -346,23 +253,14 @@ https://brasilapi.com.br/api/banks/v1
 
 O desenvolvimento foi estruturado seguindo separação clara de responsabilidades:
 
-## Routes
+* **Middlewares:**
+  Interceptam requisições, validam tokens JWT e protegem rotas confidenciais.
 
-Responsáveis pelo mapeamento dos endpoints HTTP e distribuição das requisições.
+* **Routes:**
+  Responsáveis pelo mapeamento dos endpoints HTTP e distribuição das requisições.
 
-## Controllers
+* **Controllers:**
+  Fazem a validação inicial, extraem o ID do usuário do Token (`req.user.id`), tratam exceções e gerenciam as respostas HTTP.
 
-Responsáveis por:
-
-- Validação inicial
-- Tratamento de exceções
-- Respostas HTTP
-- Intermediação entre requisição e regra de negócio
-
-## Services
-
-Responsáveis por:
-
-- Regras de negócio
-- Integração com APIs externas
-- Persistência de dados via Prisma ORM
+* **Services:**
+  Concentram 100% das regras de negócio, bloqueios lógicos de exclusão e manipulação segura de banco de dados via Prisma ORM (garantindo operações ACID).

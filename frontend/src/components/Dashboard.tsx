@@ -8,9 +8,12 @@ interface Bank {
   code: number;
 }
 
-interface DashboardProps { userId: number; }
+interface DashboardProps { 
+  userId: number; 
+  userNameSession: string; 
+}
 
-export default function Dashboard({ userId }: DashboardProps) {
+export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   const [userName, setUserName] = useState<string>('');
   const [balance, setBalance] = useState<number>(0);
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -35,15 +38,14 @@ export default function Dashboard({ userId }: DashboardProps) {
       
       const [contas, transacoes, bancosFiltro] = await Promise.all([
         accountService.getUserAccounts(), 
-        getTransactions(userId), 
+        getTransactions(), // O token no transactionService faz o trabalho sujo
         accountService.getBanks() 
       ]);
       
-      // 🛡️ A MÁGICA DA BLINDAGEM AQUI: Garante que sempre teremos um Array, mesmo se a API der erro
       const listaContas = Array.isArray(contas) ? contas : [];
       const listaTransacoes = Array.isArray(transacoes) ? transacoes : [];
       const listaBancos = Array.isArray(bancosFiltro) ? bancosFiltro : [];
-      
+
       const saldoCalculado = listaContas.reduce((acc: number, conta: any) => acc + Number(conta.balance), 0);
       
       setBalance(saldoCalculado);
@@ -52,9 +54,7 @@ export default function Dashboard({ userId }: DashboardProps) {
       
       setOfficialBanks(listaBancos.filter((b: Bank) => b.name)); 
 
-      if (userId === 1) setUserName("Jadão o Liso");
-      else if (userId === 2) setUserName("DevOps Nando");
-      else setUserName("Usuário");
+      setUserName(userNameSession || "Usuário");
       
       if (listaContas.length > 0 && !txAccountId) {
         setTxAccountId(listaContas[0].id.toString());
@@ -66,7 +66,7 @@ export default function Dashboard({ userId }: DashboardProps) {
     }
   };
 
-  useEffect(() => { loadDashboardData(); }, [userId]);
+  useEffect(() => { loadDashboardData(); }, [userId, userNameSession]);
 
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -89,6 +89,7 @@ export default function Dashboard({ userId }: DashboardProps) {
         await createTransaction(payload);
       }
       setTxDesc(''); setTxAmount('');
+      
       loadDashboardData();
     } catch (error: any) { alert(error.message); }
   };
