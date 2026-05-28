@@ -16,7 +16,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
     setError('');
 
     try {
-      // 🚀 Chamada real para o seu back-end
+      // Chamada real para a rota que acabamos de criar no back-end
       const response = await fetch('http://localhost:3001/api/users/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,10 +29,10 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
         throw new Error(data.error || 'Erro ao realizar login.');
       }
 
-      // 🔐 Salva o Token JWT no navegador para as outras rotas usarem!
+      // Salva o Token JWT no navegador para o Dashboard usar depois
       localStorage.setItem('token', data.token);
 
-      // Passa os dados reais que vieram do banco de dados
+      // Passa os dados reais que vieram do banco de dados para mudar a tela
       onLoginSuccess(data.user.id, data.user.name, data.user.role);
       
     } catch (err: any) {
@@ -98,7 +98,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             </button>
           </form>
 
-          {/* Botões de Acesso Rápido agora fazem login real na API */}
+          {/* Botões de Acesso Rápido batendo direto no banco */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-center text-gray-500 mb-4 font-medium">
               Acesso Rápido (Cobaias do Banco)

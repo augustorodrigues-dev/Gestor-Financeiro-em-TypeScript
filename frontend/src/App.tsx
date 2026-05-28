@@ -14,6 +14,10 @@ export default function App() {
   };
 
   const handleLogout = () => {
+    // 🗑️ Implementação do UC15: Remove o Token JWT do navegador para encerrar a sessão com segurança
+    localStorage.removeItem('token');
+    
+    // Limpa o estado do React e redireciona para a tela de login
     setUserSession(null);
     setAuthMode('login');
   };
@@ -26,16 +30,15 @@ export default function App() {
           <div className="flex items-center gap-4">
             <span className="text-sm opacity-90">
               Olá, <strong>{userSession.name}</strong>
-              {}
               {userSession.role === 'ADMIN' && (
-                <span className="ml-2 bg-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                <span className="ml-2 bg-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm">
                   Admin
                 </span>
               )}
             </span>
             <button 
               onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1 px-3 rounded text-sm transition-colors"
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded text-sm transition-colors shadow-sm"
             >
               Sair
             </button>

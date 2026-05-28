@@ -1,8 +1,13 @@
 import { Router, Request, Response } from 'express';
 import { TransactionService } from '../services/TransactionService';
+import { authMiddleware } from '../middlewares/authMiddleware'; // 🚀 Importando o segurança da API
 
 const router = Router();
 const transactionService = new TransactionService();
+
+// 🛡️ APLICAÇÃO DO MIDDLEWARE: 
+// A partir desta linha, TODAS as rotas abaixo exigirão o Token JWT válido.
+router.use(authMiddleware);
 
 // POST /api/transactions
 router.post('/', async (req: Request, res: Response) => {
@@ -30,6 +35,8 @@ router.post('/', async (req: Request, res: Response) => {
 // GET /api/transactions/user/:userId
 router.get('/user/:userId', async (req: Request, res: Response) => {
   try {
+    // 💡 Dica de Arquitetura: No futuro, você pode remover esse :userId da URL
+    // e pegar o ID direto do token com `req.user.id` para mais segurança!
     const userId = parseInt(req.params.userId);
     if (isNaN(userId)) return res.status(400).json({ error: "ID inválido." });
 
