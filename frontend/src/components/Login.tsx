@@ -11,19 +11,40 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const performLogin = async (loginEmail: string, loginPass: string) => {
     setLoading(true);
     setError('');
 
-    setTimeout(() => {
-      if (email.includes('@') && password.length >= 4) {
-        onLoginSuccess(1, "Usuário Teste", "USER");
-      } else {
-        setError('E-mail ou senha inválidos.');
-        setLoading(false);
+    try {
+      // 🚀 Chamada real para o seu back-end
+      const response = await fetch('http://localhost:3001/api/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail, password: loginPass })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Erro ao realizar login.');
       }
-    }, 800);
+
+      // 🔐 Salva o Token JWT no navegador para as outras rotas usarem!
+      localStorage.setItem('token', data.token);
+
+      // Passa os dados reais que vieram do banco de dados
+      onLoginSuccess(data.user.id, data.user.name, data.user.role);
+      
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    performLogin(email, password);
   };
 
   return (
@@ -77,7 +98,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             </button>
           </form>
 
-          {}
+          {/* Botões de Acesso Rápido agora fazem login real na API */}
           <div className="mt-8 pt-6 border-t border-gray-200">
             <p className="text-sm text-center text-gray-500 mb-4 font-medium">
               Acesso Rápido (Cobaias do Banco)
@@ -85,20 +106,20 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             <div className="flex flex-col gap-3">
               <div className="flex gap-3">
                 <button
-                  onClick={() => onLoginSuccess(1, "Jadão o Liso", "USER")}
+                  onClick={() => performLogin('jadao@gmail.com', '1234')}
                   className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-blue-200"
                 >
                   💸 Jadão o Liso
                 </button>
                 <button
-                  onClick={() => onLoginSuccess(2, "DevOps Nando", "USER")}
+                  onClick={() => performLogin('nando@gmail.com', '1234')}
                   className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-purple-200"
                 >
                   🐳 DevOps Nando
                 </button>
               </div>
               <button
-                onClick={() => onLoginSuccess(3, "Alexandra Bargan", "ADMIN")}
+                onClick={() => performLogin('alexandra@gmail.com', '1234')}
                 className="w-full bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-red-200 uppercase tracking-wider"
               >
                 👑 Entrar como Admin (Alexandra)

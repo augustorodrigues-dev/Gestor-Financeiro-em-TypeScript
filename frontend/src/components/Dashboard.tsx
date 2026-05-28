@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { createAccount, getUserBalance, getUserAccounts, getBanks } from '../services/accountService';
+// 🚀 1. Importação corrigida para trazer o objeto inteiro
+import { accountService } from '../services/accountService'; 
+// (Mantivemos as transações soltas, assumindo que o transactionService ainda não foi agrupado)
 import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from '../services/transactionService';
 
 interface Bank {
@@ -32,11 +34,13 @@ export default function Dashboard({ userId }: DashboardProps) {
   const loadDashboardData = async () => {
     try {
       setLoadingData(true);
+      
+      // 🚀 2. Atualizando as chamadas para usar o objeto accountService
       const [saldo, contas, transacoes, bancosFiltro] = await Promise.all([
-        getUserBalance(userId),
-        getUserAccounts(userId),
-        getTransactions(userId),
-        getBanks() 
+        accountService.getUserBalance(userId),
+        accountService.getUserAccounts(userId),
+        getTransactions(userId), 
+        accountService.getBanks() 
       ]);
       
       setBalance(saldo);
@@ -45,7 +49,7 @@ export default function Dashboard({ userId }: DashboardProps) {
       setOfficialBanks(bancosFiltro.filter((b: Bank) => b.name)); 
 
       if (userId === 1) setUserName("Jadão o Liso");
-      else if (userId === 2) setUserName("DevOpsNando");
+      else if (userId === 2) setUserName("DevOps Nando");
       else setUserName("Usuário");
       
       if (contas.length > 0 && !txAccountId) {
@@ -85,13 +89,13 @@ export default function Dashboard({ userId }: DashboardProps) {
     } catch (error: any) { alert(error.message); }
   };
 
-  
   const handleCreateAccount = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBankName) return alert("Selecione uma instituição financeira.");
 
     try {
-      await createAccount({ 
+      // 🚀 3. Chamando a criação de conta a partir do objeto
+      await accountService.createAccount({ 
         name: selectedBankName, 
         balance: 0, 
         type: accountType, 
@@ -132,7 +136,7 @@ export default function Dashboard({ userId }: DashboardProps) {
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       
-      {}
+      {/* Cabeçalho */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
         <h1 className="text-2xl font-bold">
           👋 Bem-vindo de volta, <span className="text-yellow-300 font-extrabold">{userName}</span>!
@@ -140,7 +144,7 @@ export default function Dashboard({ userId }: DashboardProps) {
         <p className="text-blue-100 text-sm mt-1">Aqui está o resumo financeiro das suas contas e despesas do mês.</p>
       </div>
 
-      {}
+      {/* Saldo Consolidado */}
       <div className="bg-white rounded-lg shadow p-6 border-l-4 border-emerald-500">
         <h2 className="text-gray-500 text-sm font-semibold uppercase tracking-wider">Saldo Consolidado</h2>
         <p className={`text-4xl font-bold mt-2 ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
@@ -150,10 +154,10 @@ export default function Dashboard({ userId }: DashboardProps) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         
-        {}
+        {/* Formulários Laterais */}
         <div className="space-y-6">
           
-          {}
+          {/* Formulário de Transação */}
           <div className={`bg-white rounded-lg shadow p-5 border transition-all ${editingTxId ? 'border-amber-400 bg-amber-50/10' : 'border-gray-200'}`}>
             <h3 className="font-bold text-gray-800 mb-4">{editingTxId ? '✏️ Editar Lançamento' : 'Nova Transação'}</h3>
             <form onSubmit={handleSaveTransaction} className="space-y-3">
@@ -176,7 +180,7 @@ export default function Dashboard({ userId }: DashboardProps) {
             </form>
           </div>
 
-          {}
+          {/* Vincular Conta */}
           <div className="bg-white rounded-lg shadow p-5 border border-gray-200">
             <h3 className="font-bold text-gray-800 mb-3 text-sm">Vincular Conta Financeira</h3>
             <form onSubmit={handleCreateAccount} className="space-y-3">
@@ -220,7 +224,7 @@ export default function Dashboard({ userId }: DashboardProps) {
 
         </div>
 
-        {}
+        {/* Extrato de Transações */}
         <div className="md:col-span-2 bg-white rounded-lg shadow border border-gray-200 flex flex-col">
           <div className="p-5 border-b border-gray-200"><h3 className="font-bold text-gray-800">Extrato de Movimentações</h3></div>
           <div className="p-0 overflow-y-auto max-h-[500px]">
