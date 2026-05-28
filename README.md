@@ -267,25 +267,54 @@ npm run dev
 
 # 🧪 Qualidade de Código & Testes
 
-O back-end conta com uma suíte de testes de integração automatizados utilizando **Jest** e **Supertest** para garantir a estabilidade do CRUD.
+O projeto adota uma **pirâmide de testes completa nos três níveis** — unitário, integração e
+end-to-end — além de **cobertura de código** e **análise estática**. Documentação detalhada:
 
-Para executar os testes com verificação de cobertura (dentro da pasta `backend/`):
+- 📋 [Casos de Uso (15)](docs/CASOS_DE_USO.md)
+- 🧪 [Casos de Teste](docs/CASOS_DE_TESTE.md)
+- 📊 [Relatório de Cobertura](docs/RELATORIO_COBERTURA.md)
+- 🔍 [Relatório de Análise Estática](docs/RELATORIO_ANALISE_ESTATICA.md)
+
+## Resumo da suíte (126 testes)
+
+| Nível | Ferramenta | Local | Qtd. |
+|-------|------------|-------|-----:|
+| Unitário (back-end) | Jest + ts-jest (mocks) | `backend/tests/unit` | 59 |
+| Integração (back-end) | Jest + Supertest + PostgreSQL | `backend/tests/integration` | 20 |
+| Unitário/Componente (front-end) | Vitest + Testing Library | `frontend/src/**/*.test.tsx` | 42 |
+| End-to-End | Playwright (Chromium) | `frontend/e2e` | 5 |
+
+## Cobertura de código (meta 70–80%)
+
+| Módulo | Linhas | Statements |
+|--------|-------:|-----------:|
+| Back-end | **97.4%** | 97.6% |
+| Front-end | **88.7%** | 86.4% |
+
+## Comandos
 
 ```bash
-npm run test:coverage
-```
+# BACK-END (requer Docker/Postgres no ar) — pasta backend/
+npm test               # unit + integração + cobertura
+npm run lint           # análise estática (ESLint)
 
----
+# FRONT-END — pasta frontend/
+npm test               # testes unitários/componente (Vitest)
+npm run test:coverage  # com relatório de cobertura
+npm run lint           # análise estática (ESLint)
+npm run test:e2e       # testes end-to-end (Playwright) — requer back-end na 3001 + seed
+```
 
 ## Estratégia de Testes
 
-A suíte de testes cobre:
+A suíte cobre, entre outros:
 
-- ✔️ Criação de transações válidas (POST)
-- ✔️ Testes negativos de segurança barrando payloads inválidos (Erro 400)
-- ✔️ Listagem dinâmica de registros (GET)
-- ✔️ Atualização parcial de dados (PUT)
-- ✔️ Exclusão automatizada (DELETE / Teardown)
+- ✔️ Autenticação JWT e controle de acesso (login, 401, middleware)
+- ✔️ CRUD completo de transações, contas e usuários (POST/GET/PUT/DELETE)
+- ✔️ Testes negativos barrando payloads inválidos (Erro 400)
+- ✔️ Regras de negócio (bloqueio de exclusão de conta com transações, saldo atômico)
+- ✔️ Integração com a Brasil API (mockada em unitário)
+- ✔️ Fluxos de UI ponta a ponta (login, dashboard, painel admin, 5ª tela)
 
 ---
 
