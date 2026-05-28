@@ -1,20 +1,28 @@
+import { BANCOS } from '../utils/bancos';
+
 const API_URL = 'http://localhost:3001/api';
 
 const getHeaders = () => {
   const token = localStorage.getItem('token');
   return {
     'Content-Type': 'application/json',
-    'Authorization': `Bearer ${token}`
+    'Authorization': `bearer ${token}`
   };
 };
 
-// 🚀 CERTIFIQUE-SE DE QUE ESTÁ ASSIM (export const accountService = { ... })
 export const accountService = {
   
   getBanks: async () => {
     const response = await fetch('https://brasilapi.com.br/api/banks/v1');
     const data = await response.json();
-    return data || [];
+    
+    const codigosPermitidos = BANCOS.map(banco => banco.code);
+
+    if (Array.isArray(data)) {
+      return data.filter((bank: any) => codigosPermitidos.includes(bank.code));
+    }
+
+    return [];
   },
 
   createAccount: async (accountData: { name: string; type: string; balance: number; userId: number }) => {
