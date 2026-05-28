@@ -2,14 +2,28 @@ import { prisma } from '../prisma';
 
 export class TransactionService {
   
-  // POST: Criar transação
   async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date }) {
-    return await prisma.transaction.create({
-      data,
-    });
+    const amountToUpdate = data.type === 'INCOME' ? data.amount : -data.amount;
+
+    const [newTransaction] = await prisma.$transaction([
+      prisma.transaction.create({
+        data: {
+          amount: data.amount,
+          description: data.description,
+          type: data.type,
+          accountId: data.accountId,
+          date: data.date
+        }
+      }),
+      prisma.account.update({
+        where: { id: data.accountId },
+        data: { balance: { increment: amountToUpdate } }
+      })
+    ]);
+
+    return newTransaction;
   }
 
-  // GET: Buscar transações de um usuário (via conta)
   async getTransactionsByUser(userId: number) {
     return await prisma.transaction.findMany({
       where: {
@@ -18,26 +32,32 @@ export class TransactionService {
         }
       },
       include: {
-        account: true // Traz os dados da conta junto
+        account: {
+          select: { name: true, type: true } 
+        }
       },
       orderBy: {
-        date: 'desc'
+        date: 'desc' 
       }
     });
   }
 
-  // PUT: Atualizar transação
   async updateTransaction(id: number, data: any) {
     return await prisma.transaction.update({
       where: { id },
-      data,
+      data: {
+        description: data.description,
+        amount: Number(data.amount),
+        type: data.type,
+        accountId: Number(data.accountId),
+        date: data.date ? new Date(data.date) : undefined
+      }
     });
   }
 
-  // DELETE: Apagar transação
   async deleteTransaction(id: number) {
     return await prisma.transaction.delete({
-      where: { id },
+      where: { id }
     });
   }
 }

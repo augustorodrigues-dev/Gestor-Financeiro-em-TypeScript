@@ -14,10 +14,7 @@ export default function App() {
   };
 
   const handleLogout = () => {
-    // 🗑️ Implementação do UC15: Remove o Token JWT do navegador para encerrar a sessão com segurança
     localStorage.removeItem('token');
-    
-    // Limpa o estado do React e redireciona para a tela de login
     setUserSession(null);
     setAuthMode('login');
   };
@@ -51,7 +48,7 @@ export default function App() {
           userSession.role === 'ADMIN' ? (
             <AdminPanel />
           ) : (
-            <Dashboard userId={userSession.id} />
+            <Dashboard userId={userSession.id} userNameSession={userSession.name} />
           )
         ) : authMode === 'login' ? (
           <Login 

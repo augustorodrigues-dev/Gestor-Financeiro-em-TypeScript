@@ -7,62 +7,57 @@ export class TransactionController {
   
   async create(req: Request, res: Response) {
     try {
-      const data = req.body;
+      const { amount, description, type, accountId, date } = req.body;
 
-      // Validação super básica
-      if (!data.amount || !data.date || !data.description || !data.type) {
-        return res.status(400).json({ error: 'Campos obrigatórios ausentes.' });
+      if (!amount || !description || !type || !accountId || !date) {
+        return res.status(400).json({ error: "Campos obrigatórios ausentes." });
       }
 
-      // Convertendo strings de data para o formato DateTime do Prisma
-      data.date = new Date(data.date);
-      if (data.dueDate) data.dueDate = new Date(data.dueDate);
+      const transaction = await transactionService.createTransaction({
+        amount: parseFloat(amount),
+        description,
+        type,
+        accountId: parseInt(accountId),
+        date: new Date(date)
+      });
 
-      const newTransaction = await transactionService.createTransaction(data);
-      return res.status(201).json(newTransaction);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro interno ao criar transação.' });
+      return res.status(201).json(transaction);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message || "Erro ao criar transação." });
     }
   }
 
   async list(req: Request, res: Response) {
     try {
-      const { userId } = req.params;
-      
-      const transactions = await transactionService.getTransactionsByUser(Number(userId));
+      const userId = req.user.id; 
+      const transactions = await transactionService.getTransactionsByUser(userId);
       return res.status(200).json(transactions);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao buscar transações.' });
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro ao buscar transações." });
     }
   }
 
   async update(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const data = req.body;
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido." });
 
-      if (data.date) data.date = new Date(data.date);
-      if (data.dueDate) data.dueDate = new Date(data.dueDate);
-
-      const updatedTransaction = await transactionService.updateTransaction(Number(id), data);
-      return res.status(200).json(updatedTransaction);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao atualizar transação.' });
+      const transaction = await transactionService.updateTransaction(id, req.body);
+      return res.status(200).json(transaction);
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
     }
   }
 
   async delete(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      
-      await transactionService.deleteTransaction(Number(id));
-      return res.status(204).send();
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ error: 'Erro ao deletar transação.' });
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) return res.status(400).json({ error: "ID inválido." });
+
+      await transactionService.deleteTransaction(id);
+      return res.status(200).json({ message: "Transação deletada com sucesso." });
+    } catch (error: any) {
+      return res.status(500).json({ error: error.message });
     }
   }
 }

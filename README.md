@@ -1,13 +1,13 @@
 # FinanceFlow 💸  
 ## Plataforma Web de Gestão Financeira Pessoal
 
-O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e intuitiva.
+O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e segura.
 
 O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br).
 
 Com os recentes avanços, a plataforma agora conta com sistema de autenticação, níveis de acesso e um painel administrativo completo.
 
-O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e execução simultânea das camadas da aplicação.
+O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e segurança de ponta a ponta com JSON Web Tokens (JWT).
 
 ---
 
@@ -126,14 +126,12 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │   │   │   └── UserService.ts
 │   │   │
 │   │   └── server.ts
-│   │
 │   ├── tests/
 │   │   └── transactions.integration.test.ts
 │   │
 │   └── package.json
 │
 ├── frontend/
-│   │
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── AdminPanel.tsx
@@ -158,11 +156,11 @@ GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 
 Antes de executar o projeto, certifique-se de possuir instalado:
 
-- Node.js v20+
-- NPM
-- Docker
-- Docker Compose
-- Git
+* Node.js v20+
+* NPM
+* Docker
+* Docker Compose
+* Git
 
 ---
 
@@ -211,6 +209,8 @@ Crie um arquivo `.env` dentro da pasta `backend/`:
 
 ```env
 DATABASE_URL="postgresql://admin:adminpassword@localhost:5433/financeflow_local"
+
+JWT_SECRET="sua_chave_secreta_aqui"
 ```
 
 ---
@@ -247,7 +247,7 @@ npx prisma db seed
 
 O projeto utiliza o pacote `concurrently` para executar front-end e back-end simultaneamente.
 
-Na raiz do projeto:
+Na raiz do projeto, execute:
 
 ```bash
 npm run dev
@@ -269,9 +269,7 @@ npm run dev
 
 O back-end conta com uma suíte de testes de integração automatizados utilizando **Jest** e **Supertest** para garantir a estabilidade do CRUD.
 
-## Executar Testes + Coverage
-
-Dentro da pasta `backend/`:
+Para executar os testes com verificação de cobertura (dentro da pasta `backend/`):
 
 ```bash
 npm run test:coverage
