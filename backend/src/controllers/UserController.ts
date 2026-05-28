@@ -1,9 +1,54 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
+import jwt from 'jsonwebtoken'; // 🚀 IMPORTANTE: Para gerar o token do UC01
+import bcrypt from 'bcrypt';
 
 const userService = new UserService();
 
 export class UserController {
+  
+  // 🚀 NOVO MÉTODO: Autenticar Usuário (UC01)
+  async login(req: Request, res: Response) {
+    try {
+      const { email, password } = req.body;
+
+      if (!email || !password) {
+        return res.status(400).json({ error: "E-mail e senha são obrigatórios." });
+      }
+
+      // Busca o usuário no banco pelo e-mail
+      const user = await userService.getUserByEmail(email); 
+      if (!user) {
+        return res.status(401).json({ error: "E-mail ou senha inválidos." });
+      }
+
+      // Compara o hash da senha usando bcrypt
+      const passwordMatch = await bcrypt.compare(password, user.passwordHash);
+      if (!passwordMatch) {
+        return res.status(401).json({ error: "E-mail ou senha inválidos." });
+      }
+
+      // Gera o Token JWT com o ID e o papel (Role) do usuário
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET || 'secret_padrao_aqui',
+        { expiresIn: '1d' } // Expira em 1 dia
+      );
+
+      // Retorna exatamente no formato que o Front-end espera
+      return res.json({
+        token,
+        user: {
+          id: user.id,
+          name: user.name,
+          role: user.role
+        }
+      });
+
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro interno ao realizar login." });
+    }
+  }
   
   async create(req: Request, res: Response) {
     try {
@@ -19,8 +64,21 @@ export class UserController {
         password, 
         role: role || 'USER' 
       });
+
+      // 🔐 PARA O UC02 (Início de sessão automático): 
+      // Vamos gerar um token direto no cadastro também para o usuário logar direto!
+      const token = jwt.sign(
+        { id: user.id, role: user.role },
+        process.env.JWT_SECRET || 'secret_padrao_aqui',
+        { expiresIn: '1d' }
+      );
       
-      return res.status(201).json({ message: "Usuário criado com sucesso!", user });
+      // Retornamos a mensagem, o usuário E o token
+      return res.status(201).json({ 
+        message: "Usuário criado com sucesso!", 
+        token, 
+        user 
+      });
       
     } catch (error: any) {
       if (error.message === "Este e-mail já está cadastrado no sistema.") {
@@ -38,6 +96,7 @@ export class UserController {
       return res.status(500).json({ error: "Erro interno ao listar usuários." });
     }
   }
+
   async update(req: Request, res: Response) {
     try {
       const { id } = req.params;
@@ -54,7 +113,6 @@ export class UserController {
     }
   }
 
-  // 🗑️ DELETE DO CRUD
   async delete(req: Request, res: Response) {
     try {
       const { id } = req.params;

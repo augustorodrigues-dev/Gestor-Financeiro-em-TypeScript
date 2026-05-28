@@ -1,6 +1,5 @@
 import { useState } from 'react';
-// Certifique-se de que a função registerUser no seu userService retorna o token também!
-import { registerUser } from '../services/userService'; 
+import { registerUser } from '../services/userService';
 
 interface RegisterProps {
   onNavigateToLogin: () => void;
@@ -22,15 +21,18 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
     try {
       const data = await registerUser({ name, email, password });
       
-      // 🔐 Salva o Token JWT gerado no cadastro para logar direto!
+      // Salva o Token JWT no localStorage para o início de sessão automático
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
       
       alert('🎉 Conta criada com sucesso!');
       
+      // Acessando o objeto "user" que vem do back-end para carregar o Dashboard
       if (data.user && data.user.id) {
-        onRegisterSuccess(data.user.id, data.user.name, data.user.role);
+        onRegisterSuccess(data.user.id, data.user.name, data.user.role || 'USER');
+      } else {
+        setError('O servidor não retornou os dados do usuário corretamente.');
       }
     } catch (err: any) {
       setError(err.message);
@@ -65,7 +67,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="Augusto Rodrigues"
+                placeholder="Seu Nome Completo"
               />
             </div>
 
@@ -77,7 +79,7 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
-                placeholder="augusto@exemplo.com"
+                placeholder="seuemail@exemplo.com"
               />
             </div>
 
@@ -110,7 +112,6 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
               Já tem uma conta? Faça login
             </button>
           </div>
-
         </div>
       </div>
     </div>

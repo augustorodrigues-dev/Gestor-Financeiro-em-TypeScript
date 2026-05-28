@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 
-// Tipagem baseada no nosso Prisma Schema
 interface Account {
   id: number;
   name: string;
@@ -10,7 +9,6 @@ interface Account {
   _count?: { transactions: number };
 }
 
-// Tipagem para os dados que vêm da Brasil API
 interface Bank {
   ispb: string;
   name: string;
@@ -20,27 +18,23 @@ interface Bank {
 
 export default function AccountManager() {
   const [accounts, setAccounts] = useState<Account[]>([]);
-  const [banks, setBanks] = useState<Bank[]>([]); // 👈 Estado para a lista oficial
+  const [banks, setBanks] = useState<Bank[]>([]); 
   const [error, setError] = useState('');
   
-  // Estados do Formulário
   const [name, setName] = useState('');
   const [type, setType] = useState('CORRENTE');
   const [balance, setBalance] = useState(0);
 
-  // Carrega as contas e os bancos ao abrir a tela
   useEffect(() => {
     loadAccounts();
-    loadBanks(); // 👈 Dispara a busca na Brasil API
+    loadBanks(); 
   }, []);
 
   const loadAccounts = async () => {
     try {
-      // Como o accountService do front não exige mais passar o userId,
-      // ele puxará as contas baseadas no token JWT automaticamente.
-      // (Ajuste caso a sua função getUserAccounts ainda exija o parâmetro)
-      const data = await accountService.getUserAccounts(1); 
-      setAccounts(data);
+      const data = await accountService.getUserAccounts(); 
+      // 🛡️ Blindagem para evitar tela branca caso a API não retorne um array
+      setAccounts(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message);
     }
@@ -49,7 +43,7 @@ export default function AccountManager() {
   const loadBanks = async () => {
     try {
       const data = await accountService.getBanks();
-      setBanks(data);
+      setBanks(Array.isArray(data) ? data : []);
     } catch (err: any) {
       console.error("Erro ao buscar bancos da Brasil API:", err);
     }
@@ -59,12 +53,14 @@ export default function AccountManager() {
     e.preventDefault();
     setError('');
     try {
-      // Se a sua accountService.createAccount ainda pedir userId, 
-      // lembre-se de passar (ex: userId: 1).
-      // Se já estiver usando o Token pelo back-end, fica assim:
-      await accountService.createAccount({ name, type, balance, userId: 1 /* Ajuste conforme seu auth */ });
+      // 🚀 Removemos o userId daqui. O backend agora pega o ID direto do Token JWT!
+      await accountService.createAccount({ 
+        name, 
+        type, 
+        balance,
+        userId: 0 // Mantido como dummy, já que o backend vai ignorar e usar o do Token
+      });
       
-      // Limpa os campos e recarrega a lista
       setName('');
       setBalance(0);
       loadAccounts();
@@ -78,8 +74,6 @@ export default function AccountManager() {
     
     try {
       setError('');
-      // Use o deleteAccount se tiver implementado no service, 
-      // ou ajuste para a função correspondente
       await accountService.deleteAccount(id);
       loadAccounts(); 
     } catch (err: any) {
@@ -97,10 +91,8 @@ export default function AccountManager() {
         </div>
       )}
 
-      {/* Formulário de Criação */}
       <form onSubmit={handleCreateAccount} className="bg-white p-4 rounded shadow-md mb-8 flex gap-4 items-end">
         
-        {/* 🚀 A MÁGICA ACONTECE AQUI: Select integrado com a Brasil API */}
         <div className="flex-1">
           <label className="block text-sm text-gray-600 mb-1">Nome da Instituição</label>
           <select 
@@ -110,11 +102,7 @@ export default function AccountManager() {
             required
           >
             <option value="" disabled>Selecione um banco oficial...</option>
-            
-            {/* Opção extra para contas manuais, caso o usuário precise */}
             <option value="Carteira Física / Dinheiro">Carteira Física / Dinheiro</option>
-            
-            {/* Mapeando os bancos reais */}
             {banks.map((bank, index) => (
               <option key={bank.ispb || index} value={bank.name}>
                 {bank.code ? `${bank.code} - ` : ''} {bank.name}
@@ -152,7 +140,6 @@ export default function AccountManager() {
         </button>
       </form>
 
-      {/* Lista de Contas */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {accounts.map(account => (
           <div key={account.id} className="bg-white p-5 rounded-lg shadow-md border-l-4 border-blue-500 flex justify-between items-center">
