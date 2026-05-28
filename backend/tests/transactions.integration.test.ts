@@ -1,8 +1,32 @@
 import request from 'supertest';
 import { app } from '../src/server';
+import { prisma } from '../src/prisma';
 
 describe('Integração: CRUD de Transações', () => {
   let transacaoCriadaId: number;
+  let tokenAuth: string; 
+
+  beforeAll(async () => {
+    const loginResponse = await request(app)
+      .post('/api/users/login') 
+      .send({
+        email: 'jadao@gmail.com',
+        password: '123' 
+      });
+
+    if (loginResponse.status !== 200) {
+      const registerResponse = await request(app)
+        .post('/api/users/register')
+        .send({
+          name: 'Cobaia Transacao',
+          email: 'test_trx_user@financeflow.com',
+          password: '123'
+        });
+      tokenAuth = registerResponse.body.token;
+    } else {
+      tokenAuth = loginResponse.body.token;
+    }
+  });
 
   it('1. Deve criar uma nova transação válida no banco de dados', async () => {
     const novaTransacao = {
@@ -15,6 +39,7 @@ describe('Integração: CRUD de Transações', () => {
 
     const response = await request(app)
       .post('/api/transactions')
+      .set('Authorization', `Bearer ${tokenAuth}`) 
       .send(novaTransacao);
 
     expect(response.status).toBe(201);
@@ -33,6 +58,7 @@ describe('Integração: CRUD de Transações', () => {
 
     const response = await request(app)
       .post('/api/transactions')
+      .set('Authorization', `Bearer ${tokenAuth}`)
       .send(transacaoInvalida);
 
     expect(response.status).toBe(400); 
@@ -40,27 +66,42 @@ describe('Integração: CRUD de Transações', () => {
   });
 
   it('3. Deve listar as transações do usuário (Read)', async () => {
-    const response = await request(app).get('/api/transactions/user/1');
+    const response = await request(app)
+      .get('/api/transactions')
+      .set('Authorization', `Bearer ${tokenAuth}`);
     
     expect(response.status).toBe(200);
     expect(Array.isArray(response.body)).toBe(true); 
   });
 
   it('4. Deve atualizar o valor da transação recém-criada', async () => {
+    expect(transacaoCriadaId).toBeDefined();
+
     const dadosAtualizados = {
-      amount: 240.00 
+      description: 'Teste Automatizado - Supermercado',
+      amount: 240.00,
+      type: 'EXPENSE',
+      accountId: 1,
+      date: '2026-05-20'
     };
 
     const response = await request(app)
       .put(`/api/transactions/${transacaoCriadaId}`)
+      .set('Authorization', `Bearer ${tokenAuth}`)
       .send(dadosAtualizados);
 
     expect(response.status).toBe(200);
-    expect(Number(response.body.amount || response.body.updatedTransaction?.amount)).toBe(240.00);
+    
+    const transacaoRetornada = response.body.transaction || response.body;
+    expect(Number(transacaoRetornada.amount)).toBe(240.00);
   });
 
   it('5. Deve apagar a transação recém-criada (Delete)', async () => {
-    const response = await request(app).delete(`/api/transactions/${transacaoCriadaId}`);
+    expect(transacaoCriadaId).toBeDefined();
+
+    const response = await request(app)
+      .delete(`/api/transactions/${transacaoCriadaId}`)
+      .set('Authorization', `Bearer ${tokenAuth}`);
     
     expect(response.status).toBe(200);
     
@@ -69,7 +110,11 @@ describe('Integração: CRUD de Transações', () => {
 
   afterAll(async () => {
     if (transacaoCriadaId) {
-      await request(app).delete(`/api/transactions/${transacaoCriadaId}`);
+      await request(app)
+        .delete(`/api/transactions/${transacaoCriadaId}`)
+        .set('Authorization', `Bearer ${tokenAuth}`);
     }
+    // Desconecta o Prisma para o terminal fechar limpo
+    await prisma.$disconnect();
   });
 });
