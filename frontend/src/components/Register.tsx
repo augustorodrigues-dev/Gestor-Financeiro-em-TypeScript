@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { registerUser } from '../services/userService';
+// Certifique-se de que a função registerUser no seu userService retorna o token também!
+import { registerUser } from '../services/userService'; 
 
 interface RegisterProps {
   onNavigateToLogin: () => void;
-  onRegisterSuccess: (userId: number, userName: string) => void;
+  onRegisterSuccess: (userId: number, userName: string, role: string) => void;
 }
 
 export default function Register({ onNavigateToLogin, onRegisterSuccess }: RegisterProps) {
@@ -20,10 +21,16 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
 
     try {
       const data = await registerUser({ name, email, password });
+      
+      // 🔐 Salva o Token JWT gerado no cadastro para logar direto!
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+      }
+      
       alert('🎉 Conta criada com sucesso!');
       
       if (data.user && data.user.id) {
-        onRegisterSuccess(data.user.id, data.user.name);
+        onRegisterSuccess(data.user.id, data.user.name, data.user.role);
       }
     } catch (err: any) {
       setError(err.message);

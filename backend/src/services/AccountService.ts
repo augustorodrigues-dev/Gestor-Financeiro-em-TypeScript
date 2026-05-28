@@ -1,50 +1,57 @@
 import { prisma } from '../prisma';
 
-interface CreateAccountDTO {
-  name: string;      
-  balance?: number; 
-  type: string; 
-  userId: number;    
-}
-
 export class AccountService {
-  async createAccount(data: CreateAccountDTO) {
+  // CREATE
+  async createAccount(userId: number, data: { name: string; type: string; balance?: number }) {
     return await prisma.account.create({
       data: {
-        name: data.name,
-        balance: data.balance ?? 0.0,
-        type: data.type,
-        userId: data.userId
+        ...data,
+        balance: data.balance || 0,
+        userId,
+      },
+    });
+  }
+
+  // READ (Listar contas do usuário logado)
+  async getAccountsByUser(userId: number) {
+    return await prisma.account.findMany({
+      where: { userId },
+      include: {
+        _count: {
+          select: { transactions: true } // Traz a contagem de transações para ajudar no Front-end
+        }
       }
     });
   }
 
-  async getAccountsByUser(userId: number) {
-    return await prisma.account.findMany({
-      where: { userId },
-      orderBy: { name: 'asc' }
-    });
-  }
+  // UPDATE
+  async updateAccount(accountId: number, userId: number, data: { name?: string; type?: string }) {
+    // Verifica se a conta pertence ao usuário antes de atualizar
+    const account = await prisma.account.findFirst({ where: { id: accountId, userId } });
+    if (!account) throw new Error('Conta não encontrada ou não pertence a este usuário.');
 
-  async updateAccount(id: number, data: Partial<CreateAccountDTO>) {
     return await prisma.account.update({
-      where: { id },
-      data
+      where: { id: accountId },
+      data,
     });
   }
 
-  async deleteAccount(id: number) {
-    const accountWithTransactions = await prisma.account.findUnique({
-      where: { id },
+  // DELETE (Com a trava de segurança do UC03)
+  async deleteAccount(accountId: number, userId: number) {
+    const account = await prisma.account.findFirst({
+      where: { id: accountId, userId },
       include: { _count: { select: { transactions: true } } }
     });
 
-    if (accountWithTransactions && accountWithTransactions._count.transactions > 0) {
-      throw new Error("Não é possível excluir uma conta que possui transações vinculadas.");
+    if (!account) throw new Error('Conta não encontrada.');
+
+    // Regra de Negócio: Fluxo Alternativo do UC03
+    if (account._count.transactions > 0) {
+      throw new Error('Exclusão bloqueada: Esta conta possui transações vinculadas. Exclua as transações primeiro.');
     }
 
     return await prisma.account.delete({
-      where: { id }
+      where: { id: accountId },
     });
   }
 }
