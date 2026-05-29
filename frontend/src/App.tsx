@@ -1,16 +1,17 @@
 import { useState } from 'react';
 import Dashboard from './pages/Dashboard';
-import Wallet from './pages/Wallet'; // 🚀 Importação da nova tela
+import Wallet from './pages/Wallet'; 
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel'; 
+import { GoalManager } from './components/GoalManager'; // 🚀 Importação da nova tela de Metas
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
   
-  // 🚀 Novo estado para controlar a aba ativa do usuário comum
-  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet'>('dashboard');
+  // 🚀 Estado atualizado para incluir a aba 'goals'
+  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals'>('dashboard');
 
   const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
     setUserSession({ id, name, role });
@@ -31,7 +32,7 @@ export default function App() {
         <div className="flex items-center gap-6">
           <h1 className="text-xl font-bold tracking-wide">FinanceFlow 💸</h1>
           
-          {/* 🚀 Menu visível apenas para Usuários Comuns Logados */}
+          {/* Menu visível apenas para Usuários Comuns Logados */}
           {userSession && userSession.role !== 'ADMIN' && (
             <div className="hidden sm:flex gap-2 bg-blue-700/50 p-1 rounded-lg">
               <button 
@@ -44,6 +45,7 @@ export default function App() {
               >
                 📊 Dashboard
               </button>
+              
               <button 
                 onClick={() => setCurrentView('wallet')}
                 className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
@@ -53,6 +55,18 @@ export default function App() {
                 }`}
               >
                 💼 Carteira
+              </button>
+
+              {/* 🚀 Novo Botão da aba Metas */}
+              <button 
+                onClick={() => setCurrentView('goals')}
+                className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
+                  currentView === 'goals' 
+                    ? 'bg-white text-blue-700 shadow-sm' 
+                    : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                }`}
+              >
+                🎯 Metas
               </button>
             </div>
           )}
@@ -84,11 +98,13 @@ export default function App() {
           userSession.role === 'ADMIN' ? (
             <AdminPanel />
           ) : (
-            // 🚀 Condicional que renderiza a aba selecionada pelo usuário
+            // 🚀 Condicional atualizada para renderizar as 3 visualizações do usuário comum
             currentView === 'dashboard' ? (
               <Dashboard userId={userSession.id} userNameSession={userSession.name} />
-            ) : (
+            ) : currentView === 'wallet' ? (
               <Wallet userId={userSession.id} />
+            ) : (
+              <GoalManager />
             )
           )
         ) : authMode === 'login' ? (
