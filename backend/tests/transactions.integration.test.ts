@@ -114,7 +114,6 @@ describe('Integração: CRUD de Transações', () => {
         .delete(`/api/transactions/${transacaoCriadaId}`)
         .set('Authorization', `Bearer ${tokenAuth}`);
     }
-    // Desconecta o Prisma para o terminal fechar limpo
     await prisma.$disconnect();
   });
 });

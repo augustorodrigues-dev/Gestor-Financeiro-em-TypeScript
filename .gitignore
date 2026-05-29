@@ -26,3 +26,6 @@ lerna-debug.log*
 
 coverage/
 .nyc_output/
+cypress/screenshots/
+cypress/videos/
+cypress/downloads/

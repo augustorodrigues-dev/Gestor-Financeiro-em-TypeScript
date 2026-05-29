@@ -4,11 +4,11 @@
 
 O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e segura.
 
-O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado e cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br).
+O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado, cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br) e gerenciar cartões de crédito de ponta a ponta.
 
-Com os recentes avanços, a plataforma agora conta com sistema de autenticação, níveis de acesso e um painel administrativo completo. O código também passou por refatorações de Clean Code, isolando constantes e melhorando a manutenibilidade.
+Com os recentes avanços, a plataforma agora conta com sistema de autenticação, níveis de acesso, um painel administrativo completo e uma arquitetura blindada por uma **Pirâmide de Testes Automatizados** (Unitários, Integração e E2E). O código também passou por refatorações de Clean Code, isolando constantes e melhorando a manutenibilidade.
 
-O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e segurança de ponta a ponta com JSON Web Tokens (JWT).
+O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e segurança com JSON Web Tokens (JWT).
 
 ---
 
@@ -32,9 +32,15 @@ Registro completo de entradas e saídas financeiras (**CRUD de transações**) v
 
 ---
 
+## 💳 Gestão de Cartões de Crédito
+
+Módulo completo para cadastro de cartões, acompanhamento de faturas e cálculo matemático automático de limite disponível em tempo real, incluindo travas de segurança contra exclusão indevida.
+
+---
+
 ## 💰 Saldo Total Dinâmico
 
-Atualização automática baseada no somatório das contas e transações salvas no banco de dados.
+Atualização automática baseada no somatório das contas, transações e faturas salvas no banco de dados.
 
 ---
 
@@ -46,13 +52,7 @@ Integração com instituições financeiras reais listadas via [Brasil API](http
 
 ## 🌱 Database Seeding Automático
 
-População de dados inicial (usuários padrão, contas e transações de teste) com um único comando para facilitar o ambiente de desenvolvimento.
-
----
-
-## 🧪 Testes de Integração Automatizados
-
-Cobertura de rotas HTTP, validações de erro, persistência e teardown automático utilizando **Jest** e **Supertest**, cobrindo fluxos de transações e gestão de usuários.
+População de dados inicial (usuários padrão, administradores, contas e transações de teste) com um único comando para facilitar o ambiente de desenvolvimento.
 
 ---
 
@@ -87,88 +87,70 @@ Front-end e back-end executados simultaneamente utilizando um único comando.
 * Prisma ORM
 * bcrypt
 * JSON Web Token (JWT)
-* @prisma/client
-* @prisma/adapter-pg
 
 ---
 
 ## Banco de Dados & Infraestrutura
 
 * PostgreSQL 15
-* Docker
-* Docker Compose
+* Docker & Docker Compose
 * pgAdmin4
 
 ---
 
-## Qualidade & Testes
+## Qualidade & Testes (Pirâmide Completa)
 
-* Jest
-* ts-jest
-* Supertest
-
----
-
-## API Externa
-
-* [Brasil API](https://brasilapi.com.br)
+* Jest & ts-jest (Testes Unitários e de Integração)
+* Supertest (Mock de Requisições HTTP)
+* Cypress (Testes End-to-End / E2E)
 
 ---
 
 # 📁 Estrutura do Projeto
 
-```plaintext
+```plaintext id="s2vl0v"
 GESTOR-FINANCEIRO-EM-TYPESCRIPT/
 │
 ├── backend/
-│   │
 │   ├── prisma/
-│   │   ├── migrations/
 │   │   ├── schema.prisma
 │   │   └── seed.ts
-│   │
 │   ├── src/
 │   │   ├── controllers/
+│   │   │   ├── CreditCardController.ts
 │   │   │   ├── TransactionController.ts
 │   │   │   └── userController.ts
-│   │   │
 │   │   ├── routes/
+│   │   │   ├── creditCard.routes.ts
 │   │   │   ├── transaction.routes.ts
 │   │   │   └── userRoutes.ts
-│   │   │
 │   │   ├── services/
 │   │   │   ├── brasilApiService.ts
+│   │   │   ├── CreditCardService.ts
 │   │   │   ├── TransactionService.ts
 │   │   │   └── UserService.ts
-│   │   │
 │   │   └── server.ts
-│   │
-│   ├── tests/
-│   │   ├── transactions.integration.test.ts
-│   │   └── users.integration.test.ts
-│   │
-│   └── package.json
+│   └── tests/
+│       ├── CreditCardService.test.ts
+│       ├── creditCard.integration.test.ts
+│       └── transactions.integration.test.ts
 │
 ├── frontend/
+│   ├── cypress/
+│   │   └── e2e/
+│   │       ├── creditCard.cy.ts
+│   │       └── users.cy.ts
 │   ├── src/
 │   │   ├── components/
 │   │   │   ├── AdminPanel.tsx
 │   │   │   ├── Dashboard.tsx
-│   │   │   ├── Login.tsx
-│   │   │   └── Register.tsx
-│   │   │
+│   │   │   └── CreditCardManager.tsx
 │   │   ├── services/
-│   │   ├── utils/
-│   │   │   └── knownBanks.ts
-│   │   │
-│   │   ├── App.tsx
-│   │   └── main.tsx
-│   │
-│   └── package.json
+│   │   └── App.tsx
+│   └── cypress.config.ts
 │
 ├── docker-compose.yml
-├── package.json
-└── README.md
+└── package.json
 ```
 
 ---
@@ -179,8 +161,7 @@ Antes de executar o projeto, certifique-se de possuir instalado:
 
 * Node.js v20+
 * NPM
-* Docker
-* Docker Compose
+* Docker e Docker Compose
 * Git
 
 ---
@@ -189,7 +170,7 @@ Antes de executar o projeto, certifique-se de possuir instalado:
 
 ## 1️⃣ Clonar o Repositório
 
-```bash
+```bash id="7w7jq4"
 git clone https://github.com/augustorodrigues-dev/Gestor-Financeiro-em-TypeScript.git
 
 cd Gestor-Financeiro-em-TypeScript
@@ -199,26 +180,22 @@ cd Gestor-Financeiro-em-TypeScript
 
 ## 2️⃣ Instalar as Dependências
 
-```bash
-# Dependências da raiz
+```bash id="7omtrw"
+# Dependências da raiz, backend e frontend
 npm install
 
-# Dependências do backend
-cd backend
-npm install
+cd backend && npm install
 
-# Dependências do frontend
-cd ../frontend
-npm install
+cd ../frontend && npm install
 ```
 
 ---
 
 ## 3️⃣ Subir a Infraestrutura Docker
 
-Execute na raiz do projeto:
+Na raiz do projeto, execute:
 
-```bash
+```bash id="ok7yjp"
 docker compose up -d
 ```
 
@@ -228,10 +205,10 @@ docker compose up -d
 
 Crie um arquivo `.env` dentro da pasta `backend/`:
 
-```env
+```env id="mwbjcd"
 DATABASE_URL="postgresql://admin:adminpassword@localhost:5433/financeflow_local"
 
-JWT_SECRET="sua_chave_secreta_aqui"
+JWT_SECRET="chave_teste"
 ```
 
 ---
@@ -240,26 +217,12 @@ JWT_SECRET="sua_chave_secreta_aqui"
 
 Dentro da pasta `backend/`:
 
-```bash
+```bash id="i9oj3x"
 npx prisma generate
 
 npx prisma migrate dev --name init_local
-```
 
----
-
-## 6️⃣ Popular o Banco de Dados (Seeding)
-
-Ainda na pasta `backend/`:
-
-```bash
 npx prisma db seed
-```
-
-Caso precise resetar completamente o banco de dados futuramente:
-
-```bash
-npx prisma migrate reset
 ```
 
 ---
@@ -270,64 +233,84 @@ O projeto utiliza o pacote `concurrently` para executar front-end e back-end sim
 
 Na raiz do projeto, execute:
 
-```bash
+```bash id="1i8bfb"
 npm run dev
 ```
 
 ---
 
-# 🌐 Acessos da Aplicação
+# 🌐 Endereços da Aplicação
 
 | Serviço           | URL                   |
 | ----------------- | --------------------- |
-| Back-end (API)    | http://localhost:3001 |
 | Front-end (React) | http://localhost:5173 |
+| Back-end (API)    | http://localhost:3001 |
 | pgAdmin4          | http://localhost:5050 |
 
 ---
 
 # 🧪 Qualidade de Código & Testes
 
-O back-end conta com suítes de testes de integração automatizados utilizando Jest e Supertest para garantir a estabilidade do CRUD de Transações e da Gestão de Usuários.
+A aplicação possui uma arquitetura robusta validada por uma pirâmide de testes completa, garantindo a integridade desde a regra de negócio até a interface gráfica do usuário final.
 
-Para executar os testes com verificação de cobertura (dentro da pasta `backend/`):
+---
 
-```bash
-npm run test:coverage
+## 🔬 Testes Unitários e de Integração (Backend)
+
+Cobrem lógicas matemáticas, travas de segurança, rotas HTTP e persistência real no banco de dados.
+
+Executados com Jest e Supertest.
+
+```bash id="h67v4m"
+cd backend
+
+npm test
 ```
 
 ---
 
-## Estratégia de Testes
+## 🖥️ Testes End-to-End (E2E) - Frontend
 
-A suíte de testes cobre múltiplos cenários, incluindo:
+Simulam o comportamento real do usuário interagindo com a interface gráfica, garantindo que o fluxo completo (login, navegação, preenchimento de formulários e exclusão visual) funcione perfeitamente.
 
-* ✔️ CRUD de Usuários: Criação de administradores, edição de privilégios e exclusão em cascata.
-* ✔️ Segurança e Validação: Bloqueio de e-mails duplicados e proteção de rotas (Erro 400 e 401).
-* ✔️ Transações Seguras: Criação de transações válidas vinculadas a contas.
-* ✔️ Listagem e Atualização: Testes de requisições GET e PUT com atualização de dados.
+Executados com Cypress.
+
+```bash id="qf2jcb"
+cd frontend
+
+npx cypress open
+```
+
+---
+
+## ✅ Principais Cenários Cobertos
+
+* ✔️ Gestão de Cartões: Cadastro de cartões de crédito na interface com validação de renderização.
+* ✔️ Segurança e Validação: Bloqueio de exclusão de cartões com faturas ativas.
+* ✔️ Integração Real: Injeção de Bearer Tokens reais nos testes de rotas protegidas.
 * ✔️ Teardown Automático: Limpeza do banco de dados ao fim da suíte utilizando requisições DELETE controladas.
 
 ---
 
 # 📊 Gerenciamento Visual com pgAdmin4
 
-O pgAdmin4 está disponível para administração visual do banco de dados via Docker.
+O pgAdmin4 está disponível para administração visual do banco de dados.
 
-## Credenciais de Login
+---
 
-```plaintext
+## 🔑 Credenciais de Login
+
+```plaintext id="t20vl4"
 Email: admin@financeflow.com
 Senha: admin
 ```
 
 ---
 
-## Configuração do Servidor no pgAdmin
+## ⚙️ Configuração do Servidor
 
 | Campo                | Valor             |
 | -------------------- | ----------------- |
-| Name                 | FinanceFlow Local |
 | Host name/address    | db                |
 | Port                 | 5432              |
 | Maintenance database | financeflow_local |
@@ -338,45 +321,31 @@ Senha: admin
 
 # 📌 Diretrizes da Arquitetura
 
-O desenvolvimento foi estruturado seguindo o padrão de arquitetura em camadas (MVC adaptado) e princípios de Clean Code para garantir uma separação clara de responsabilidades.
+O desenvolvimento foi estruturado seguindo o padrão de arquitetura em camadas (MVC adaptado) e princípios de Clean Code.
 
 ---
 
 ## Routes
 
-Responsáveis apenas pelo mapeamento dos endpoints HTTP, aplicação de middlewares de segurança (JWT) e distribuição das requisições.
+Responsáveis pelo mapeamento dos endpoints HTTP e aplicação de middlewares de segurança.
 
 ---
 
 ## Controllers
 
-Responsáveis pela validação inicial, tratamento de exceções (`try/catch`), envio das respostas HTTP e intermediação entre as camadas.
+Responsáveis pelo tratamento de exceções e envio das respostas HTTP.
 
 ---
 
 ## Services
 
-Responsáveis por abrigar as regras de negócio da aplicação, integração com APIs externas, criptografia de senhas e persistência de dados utilizando o Prisma ORM (garantindo operações ACID).
+Responsáveis pelas regras de negócio rigorosas e persistência de dados utilizando Prisma ORM.
 
 ---
 
 ## Utils / Constants
 
-Isolamento de dados estáticos e de configurações externas (como os códigos da Brasil API), mantendo os serviços enxutos e fáceis de dar manutenção.
-
----
-
-# 📦 Principais Recursos do Projeto
-
-* Arquitetura Full Stack moderna com TypeScript
-* Persistência de dados segura com Prisma ORM
-* API REST estruturada com Express e JWT
-* Banco PostgreSQL isolado via Docker
-* Controle de autenticação e autorização
-* Painel administrativo com gerenciamento de usuários
-* Integração com API externa filtrada via dicionário estático (Clean Code)
-* Duas suítes de testes automatizados de integração
-* Estrutura escalável e ambiente de desenvolvimento padronizado
+Isolamento de dados estáticos para manter os serviços enxutos e organizados.
 
 ---
 
