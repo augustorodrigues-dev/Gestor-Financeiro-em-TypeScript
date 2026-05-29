@@ -4,13 +4,28 @@ import Login from './components/Login';
 import Register from './components/Register';
 import AdminPanel from './components/AdminPanel';
 import AccountManager from './components/AccountManager';
+import CategoryManager from './components/CategoryManager';
+import CreditCardManager from './components/CreditCardManager';
+import GoalManager from './components/GoalManager';
+import Reports from './components/Reports';
+import Profile from './components/Profile';
+
+type View = 'dashboard' | 'accounts' | 'categories' | 'cards' | 'goals' | 'reports' | 'profile';
+
+const TABS: { id: View; label: string }[] = [
+  { id: 'dashboard', label: 'Painel' },
+  { id: 'accounts', label: 'Contas' },
+  { id: 'categories', label: 'Categorias' },
+  { id: 'cards', label: 'Cartões' },
+  { id: 'goals', label: 'Metas' },
+  { id: 'reports', label: 'Relatórios' },
+  { id: 'profile', label: 'Perfil' },
+];
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
-
   const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
-
-  const [view, setView] = useState<'dashboard' | 'accounts'>('dashboard');
+  const [view, setView] = useState<View>('dashboard');
 
   const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
     setUserSession({ id, name, role });
@@ -28,39 +43,14 @@ export default function App() {
   return (
     <div className="min-h-screen bg-neutral-100 font-sans text-neutral-900">
       <nav className="sticky top-0 z-20 flex items-center justify-between bg-gradient-brand px-4 py-3 text-white shadow-card sm:px-8">
-        <div className="flex items-center gap-6">
-          <h1 className="text-lg font-extrabold tracking-wide text-shadow-sm sm:text-xl">FinanceFlow 💸</h1>
-
-          {isUser && (
-            <div className="hidden items-center gap-1 sm:flex" role="tablist" aria-label="Navegação principal">
-              <button
-                role="tab"
-                aria-selected={view === 'dashboard'}
-                onClick={() => setView('dashboard')}
-                className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${view === 'dashboard' ? 'bg-white/20 text-white' : 'text-brand-100 hover:bg-white/10'}`}
-              >
-                Painel
-              </button>
-              <button
-                role="tab"
-                aria-selected={view === 'accounts'}
-                onClick={() => setView('accounts')}
-                className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70 ${view === 'accounts' ? 'bg-white/20 text-white' : 'text-brand-100 hover:bg-white/10'}`}
-              >
-                Minhas Contas
-              </button>
-            </div>
-          )}
-        </div>
+        <h1 className="text-lg font-extrabold tracking-wide text-shadow-sm sm:text-xl">FinanceFlow 💸</h1>
 
         {userSession && (
           <div className="flex items-center gap-3 sm:gap-4">
-            <span className="text-sm opacity-90">
+            <span className="hidden text-sm opacity-90 sm:inline">
               Olá, <strong>{userSession.name}</strong>
               {userSession.role === 'ADMIN' && (
-                <span className="ml-2 rounded bg-danger-500 px-2 py-0.5 text-2xs font-bold uppercase tracking-wider shadow-sm">
-                  Admin
-                </span>
+                <span className="ml-2 rounded bg-danger-500 px-2 py-0.5 text-2xs font-bold uppercase tracking-wider shadow-sm">Admin</span>
               )}
             </span>
             <button
@@ -74,23 +64,18 @@ export default function App() {
       </nav>
 
       {isUser && (
-        <div className="flex gap-1 border-b border-neutral-200 bg-white px-4 py-2 sm:hidden" role="tablist" aria-label="Navegação principal">
-          <button
-            role="tab"
-            aria-selected={view === 'dashboard'}
-            onClick={() => setView('dashboard')}
-            className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${view === 'dashboard' ? 'bg-brand-50 text-brand-700' : 'text-neutral-500'}`}
-          >
-            Painel
-          </button>
-          <button
-            role="tab"
-            aria-selected={view === 'accounts'}
-            onClick={() => setView('accounts')}
-            className={`flex-1 rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${view === 'accounts' ? 'bg-brand-50 text-brand-700' : 'text-neutral-500'}`}
-          >
-            Minhas Contas
-          </button>
+        <div className="flex gap-1 overflow-x-auto border-b border-neutral-200 bg-white px-2 py-2 sm:px-8" role="tablist" aria-label="Navegação principal">
+          {TABS.map(tab => (
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={view === tab.id}
+              onClick={() => setView(tab.id)}
+              className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 ${view === tab.id ? 'bg-brand-50 text-brand-700' : 'text-neutral-500 hover:bg-neutral-50'}`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       )}
 
@@ -100,6 +85,16 @@ export default function App() {
             <AdminPanel />
           ) : view === 'accounts' ? (
             <AccountManager />
+          ) : view === 'categories' ? (
+            <CategoryManager />
+          ) : view === 'cards' ? (
+            <CreditCardManager />
+          ) : view === 'goals' ? (
+            <GoalManager />
+          ) : view === 'reports' ? (
+            <Reports />
+          ) : view === 'profile' ? (
+            <Profile userName={userSession.name} onUpdated={(name) => setUserSession({ ...userSession, name })} />
           ) : (
             <Dashboard userId={userSession.id} userNameSession={userSession.name} />
           )

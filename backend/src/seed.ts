@@ -103,13 +103,30 @@ async function main() {
   }
 
 
+  // Dados de domínio para o Jadão (categorias, cartão e meta) — UC05/UC08/UC09
+  await prisma.category.createMany({
+    data: [
+      { name: 'Alimentação', type: 'EXPENSE', icon: '🍔', color: '#ef4444', isDefault: true, userId: jadao.id },
+      { name: 'Salário', type: 'INCOME', icon: '💰', color: '#10b981', isDefault: true, userId: jadao.id },
+      { name: 'Lazer', type: 'EXPENSE', icon: '🎮', color: '#6366f1', isDefault: false, userId: jadao.id },
+    ],
+  });
+
+  await prisma.creditCard.create({
+    data: { name: 'Inter Mastercard', limitAmount: 5000, closingDay: 20, dueDay: 28, userId: jadao.id },
+  });
+
+  await prisma.goal.create({
+    data: { name: 'Reserva de Emergência', targetAmount: 10000, currentAmount: 2500, deadline: new Date('2026-12-31'), userId: jadao.id },
+  });
+
   console.log('👑 Criando administradora Alexandra...');
   await prisma.user.create({
     data: {
       name: 'Alexandra Bargan',
       email: 'alexandra@gmail.com',
       passwordHash: passwordHash,
-      role: 'ADMIN' 
+      role: 'ADMIN'
     }
   });
 

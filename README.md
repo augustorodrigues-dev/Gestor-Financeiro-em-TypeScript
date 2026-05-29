@@ -270,26 +270,27 @@ npm run dev
 O projeto adota uma **pirâmide de testes completa nos três níveis** — unitário, integração e
 end-to-end — além de **cobertura de código** e **análise estática**. Documentação detalhada:
 
-- 📋 [Casos de Uso (15)](docs/CASOS_DE_USO.md)
+- 📋 [Casos de Uso (20)](docs/CASOS_DE_USO.md)
 - 🧪 [Casos de Teste](docs/CASOS_DE_TESTE.md)
 - 📊 [Relatório de Cobertura](docs/RELATORIO_COBERTURA.md)
 - 🔍 [Relatório de Análise Estática](docs/RELATORIO_ANALISE_ESTATICA.md)
+- 🚀 [Tecnologias](docs/TECNOLOGIAS.md) · 🗄️ [Modelagem do BD](docs/MODELAGEM_BD.md)
 
-## Resumo da suíte (126 testes)
+## Resumo da suíte (208 testes)
 
 | Nível | Ferramenta | Local | Qtd. |
 |-------|------------|-------|-----:|
-| Unitário (back-end) | Jest + ts-jest (mocks) | `backend/tests/unit` | 59 |
-| Integração (back-end) | Jest + Supertest + PostgreSQL | `backend/tests/integration` | 20 |
-| Unitário/Componente (front-end) | Vitest + Testing Library | `frontend/src/**/*.test.tsx` | 42 |
-| End-to-End | Playwright (Chromium) | `frontend/e2e` | 5 |
+| Unitário (back-end) | Jest + ts-jest (mocks) | `backend/tests/unit` | 93 |
+| Integração (back-end) | Jest + Supertest + PostgreSQL | `backend/tests/integration` | 29 |
+| Unitário/Componente (front-end) | Vitest + Testing Library | `frontend/src/**/*.test.tsx` | 80 |
+| End-to-End | Cypress | `frontend/cypress/e2e` | 6 |
 
 ## Cobertura de código (meta 70–80%)
 
 | Módulo | Linhas | Statements |
 |--------|-------:|-----------:|
-| Back-end | **97.4%** | 97.6% |
-| Front-end | **88.7%** | 86.4% |
+| Back-end | **89.9%** | 87.9% |
+| Front-end | **89.3%** | 85.3% |
 
 ## Comandos
 
@@ -300,9 +301,13 @@ npm run lint           # análise estática (ESLint)
 
 # FRONT-END — pasta frontend/
 npm test               # testes unitários/componente (Vitest)
-npm run test:coverage  # com relatório de cobertura
+npm run test:coverage  # com relatório de cobertura (gera lcov para o SonarQube)
 npm run lint           # análise estática (ESLint)
-npm run test:e2e       # testes end-to-end (Playwright) — requer back-end na 3001 + seed
+npm run test:e2e       # testes end-to-end (Cypress) — sobe o front; requer back-end na 3001 + seed
+
+# QUALIDADE — SonarQube (raiz do projeto)
+docker compose -f docker-compose.sonar.yml up -d   # sobe o servidor (http://localhost:9000)
+npx sonarqube-scanner -Dsonar.token=SEU_TOKEN      # análise (ver docs/RELATORIO_ANALISE_ESTATICA.md)
 ```
 
 ## Estratégia de Testes
@@ -310,11 +315,11 @@ npm run test:e2e       # testes end-to-end (Playwright) — requer back-end na 3
 A suíte cobre, entre outros:
 
 - ✔️ Autenticação JWT e controle de acesso (login, 401, middleware)
-- ✔️ CRUD completo de transações, contas e usuários (POST/GET/PUT/DELETE)
+- ✔️ CRUD completo: transações, contas, usuários, categorias, cartões e metas (POST/GET/PUT/DELETE)
 - ✔️ Testes negativos barrando payloads inválidos (Erro 400)
-- ✔️ Regras de negócio (bloqueio de exclusão de conta com transações, saldo atômico)
-- ✔️ Integração com a Brasil API (mockada em unitário)
-- ✔️ Fluxos de UI ponta a ponta (login, dashboard, painel admin, 5ª tela)
+- ✔️ Regras de negócio (bloqueio de exclusão, saldo atômico, limite crítico de cartão, progresso de meta)
+- ✔️ Integração com Brasil API e AwesomeAPI (câmbio, com cache)
+- ✔️ Fluxos de UI ponta a ponta (login, dashboard, painel admin, telas e perfil)
 
 ---
 

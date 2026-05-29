@@ -6,6 +6,7 @@ jest.mock('../../src/prisma', () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),
+      findFirst: jest.fn(),
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
@@ -99,6 +100,55 @@ describe('Unitário: UserService', () => {
       expect(prismaMock.transaction.deleteMany).toHaveBeenCalledWith({ where: { account: { userId: 5 } } });
       expect(prismaMock.account.deleteMany).toHaveBeenCalledWith({ where: { userId: 5 } });
       expect(prismaMock.user.delete).toHaveBeenCalledWith({ where: { id: 5 } });
+    });
+  });
+
+  describe('updateProfile (UC11)', () => {
+    it('atualiza nome/e-mail e re-hasheia a senha', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      prismaMock.user.update.mockResolvedValue({ id: 1, name: 'Novo' });
+      await service.updateProfile(1, { name: 'Novo', email: 'n@x.com', password: 'nova' });
+      expect(bcrypt.hash).toHaveBeenCalledWith('nova', 10);
+      expect(prismaMock.user.update).toHaveBeenCalled();
+    });
+
+    it('bloqueia e-mail já usado por outra conta', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ id: 99, email: 'dup@x.com' });
+      await expect(service.updateProfile(1, { email: 'dup@x.com' })).rejects.toThrow('já está em uso');
+    });
+
+    it('permite manter o próprio e-mail', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1, email: 'eu@x.com' });
+      prismaMock.user.update.mockResolvedValue({ id: 1 });
+      await service.updateProfile(1, { email: 'eu@x.com', name: 'Eu' });
+      expect(prismaMock.user.update).toHaveBeenCalled();
+    });
+  });
+
+  describe('recuperação de senha (UC18)', () => {
+    it('generateResetToken retorna null para e-mail inexistente', async () => {
+      prismaMock.user.findUnique.mockResolvedValue(null);
+      expect(await service.generateResetToken('nao@existe.com')).toBeNull();
+    });
+
+    it('generateResetToken gera e salva token', async () => {
+      prismaMock.user.findUnique.mockResolvedValue({ id: 1 });
+      prismaMock.user.update.mockResolvedValue({ id: 1 });
+      const token = await service.generateResetToken('a@x.com');
+      expect(typeof token).toBe('string');
+      expect(prismaMock.user.update).toHaveBeenCalled();
+    });
+
+    it('resetPassword falha com token inválido/expirado', async () => {
+      prismaMock.user.findFirst.mockResolvedValue(null);
+      await expect(service.resetPassword('ruim', 'nova')).rejects.toThrow('inválido ou expirado');
+    });
+
+    it('resetPassword redefine a senha com token válido', async () => {
+      prismaMock.user.findFirst.mockResolvedValue({ id: 1 });
+      prismaMock.user.update.mockResolvedValue({ id: 1 });
+      await service.resetPassword('bom', 'nova');
+      expect(bcrypt.hash).toHaveBeenCalledWith('nova', 10);
     });
   });
 });

@@ -7,7 +7,7 @@ export class TransactionController {
   
   async create(req: Request, res: Response) {
     try {
-      const { amount, description, type, accountId, date } = req.body;
+      const { amount, description, type, accountId, date, isRecurring, recurrencePeriod, dueDate } = req.body;
 
       if (!amount || !description || !type || !accountId || !date) {
         return res.status(400).json({ error: "Campos obrigatórios ausentes." });
@@ -18,12 +18,25 @@ export class TransactionController {
         description,
         type,
         accountId: parseInt(accountId),
-        date: new Date(date)
+        date: new Date(date),
+        isRecurring: Boolean(isRecurring),
+        recurrencePeriod,
+        dueDate: dueDate ? new Date(dueDate) : undefined
       });
 
       return res.status(201).json(transaction);
     } catch (error: any) {
       return res.status(500).json({ error: error.message || "Erro ao criar transação." });
+    }
+  }
+
+  // UC17 — Lista transações agendadas/recorrentes
+  async listScheduled(req: Request, res: Response) {
+    try {
+      const scheduled = await transactionService.getScheduledTransactions(req.user.id);
+      return res.status(200).json(scheduled);
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro ao buscar transações agendadas." });
     }
   }
 

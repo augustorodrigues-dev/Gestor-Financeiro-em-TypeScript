@@ -1,0 +1,20 @@
+# Servidor SonarQube para análise estática de qualidade.
+# Subir: docker compose -f docker-compose.sonar.yml up -d
+# Acesso: http://localhost:9000  (login inicial: admin / admin)
+services:
+  sonarqube:
+    image: sonarqube:lts-community
+    container_name: financeflow_sonarqube
+    ports:
+      - "9000:9000"
+    environment:
+      SONAR_ES_BOOTSTRAP_CHECKS_DISABLE: "true"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+volumes:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:

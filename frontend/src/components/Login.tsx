@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import ForgotPassword from './ForgotPassword';
 
 interface LoginProps {
   onLoginSuccess: (userId: number, userName: string, role: string) => void;
@@ -10,6 +11,11 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showForgot, setShowForgot] = useState(false);
+
+  if (showForgot) {
+    return <ForgotPassword onBack={() => setShowForgot(false)} />;
+  }
 
   const performLogin = async (loginEmail: string, loginPass: string) => {
     setLoading(true);
@@ -133,12 +139,18 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             </div>
           </div>
 
-          <div className="mt-6 text-center">
+          <div className="mt-6 space-y-2 text-center">
             <button
               onClick={onNavigateToRegister}
-              className="rounded text-sm font-semibold text-brand-600 transition-colors hover:text-brand-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+              className="block w-full rounded text-sm font-semibold text-brand-600 transition-colors hover:text-brand-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               Não tem uma conta? Cadastre-se aqui
+            </button>
+            <button
+              onClick={() => setShowForgot(true)}
+              className="block w-full rounded text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
+            >
+              Esqueci minha senha
             </button>
           </div>
 

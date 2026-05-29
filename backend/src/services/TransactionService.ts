@@ -2,7 +2,7 @@ import { prisma } from '../prisma';
 
 export class TransactionService {
   
-  async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date }) {
+  async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date; isRecurring?: boolean; recurrencePeriod?: string; dueDate?: Date }) {
     const amountToUpdate = data.type === 'INCOME' ? data.amount : -data.amount;
 
     const [newTransaction] = await prisma.$transaction([
@@ -12,7 +12,10 @@ export class TransactionService {
           description: data.description,
           type: data.type,
           accountId: data.accountId,
-          date: data.date
+          date: data.date,
+          isRecurring: data.isRecurring ?? false,
+          recurrencePeriod: data.recurrencePeriod,
+          dueDate: data.dueDate
         }
       }),
       prisma.account.update({
@@ -22,6 +25,15 @@ export class TransactionService {
     ]);
 
     return newTransaction;
+  }
+
+  // UC17 — Lista as transações agendadas/recorrentes do usuário
+  async getScheduledTransactions(userId: number) {
+    return await prisma.transaction.findMany({
+      where: { isRecurring: true, account: { userId } },
+      include: { account: { select: { name: true } } },
+      orderBy: { date: 'desc' }
+    });
   }
 
   async getTransactionsByUser(userId: number) {

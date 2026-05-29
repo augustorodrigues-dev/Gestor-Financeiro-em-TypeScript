@@ -122,4 +122,54 @@ export class UserController {
       return res.status(500).json({ error: "Erro interno ao excluir usuário." });
     }
   }
+
+  // UC11 — Editar Perfil (usa o id do token JWT)
+  async updateProfile(req: Request, res: Response) {
+    try {
+      const userId = req.user.id;
+      const { name, email, password } = req.body;
+      if (!name && !email && !password) {
+        return res.status(400).json({ error: "Informe ao menos um campo para atualizar." });
+      }
+      const updated = await userService.updateProfile(userId, { name, email, password });
+      return res.json({ message: "Perfil atualizado com sucesso!", user: updated });
+    } catch (error: any) {
+      if (error.message?.includes("já está em uso")) {
+        return res.status(400).json({ error: error.message });
+      }
+      return res.status(500).json({ error: "Erro interno ao atualizar perfil." });
+    }
+  }
+
+  // UC18 — Solicitar recuperação de senha
+  async forgotPassword(req: Request, res: Response) {
+    try {
+      const { email } = req.body;
+      if (!email) return res.status(400).json({ error: "E-mail é obrigatório." });
+
+      const token = await userService.generateResetToken(email);
+      // Resposta genérica para não revelar quais e-mails existem (fluxo alternativo UC18)
+      return res.json({
+        message: "Se o e-mail estiver cadastrado, um link de redefinição será enviado.",
+        // Em produção, o token iria por e-mail. Sem serviço de e-mail, expomos para o demo:
+        resetToken: token || undefined,
+      });
+    } catch (error: any) {
+      return res.status(500).json({ error: "Erro ao processar a solicitação." });
+    }
+  }
+
+  // UC18 — Redefinir senha com o token
+  async resetPassword(req: Request, res: Response) {
+    try {
+      const { token, password } = req.body;
+      if (!token || !password) {
+        return res.status(400).json({ error: "Token e nova senha são obrigatórios." });
+      }
+      await userService.resetPassword(token, password);
+      return res.json({ message: "Senha redefinida com sucesso!" });
+    } catch (error: any) {
+      return res.status(400).json({ error: error.message });
+    }
+  }
 }

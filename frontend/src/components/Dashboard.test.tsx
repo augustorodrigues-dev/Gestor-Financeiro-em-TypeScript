@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import Dashboard from './Dashboard';
 import { accountService } from '../services/accountService';
 import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from '../services/transactionService';
+import { getUpcomingAlerts } from '../services/financeService';
 
 vi.mock('../services/accountService', () => ({
   accountService: {
@@ -19,15 +20,21 @@ vi.mock('../services/transactionService', () => ({
   updateTransaction: vi.fn(),
 }));
 
+vi.mock('../services/financeService', () => ({
+  getUpcomingAlerts: vi.fn(),
+}));
+
 const accSvc = accountService as unknown as Record<string, ReturnType<typeof vi.fn>>;
 const getTx = getTransactions as unknown as ReturnType<typeof vi.fn>;
 const createTx = createTransaction as unknown as ReturnType<typeof vi.fn>;
 const deleteTx = deleteTransaction as unknown as ReturnType<typeof vi.fn>;
 const updateTx = updateTransaction as unknown as ReturnType<typeof vi.fn>;
+const alertsMock = getUpcomingAlerts as unknown as ReturnType<typeof vi.fn>;
 
 const accounts = [{ id: 1, name: 'Banco Inter', type: 'CORRENTE', balance: 100 }];
 const transactions = [
   { id: 1, description: 'Salário', amount: 100, type: 'INCOME', accountId: 1, date: '2026-05-20' },
+  { id: 2, description: 'Mercado', amount: 50, type: 'EXPENSE', accountId: 1, date: '2026-05-21' },
 ];
 
 describe('<Dashboard />', () => {
@@ -36,6 +43,7 @@ describe('<Dashboard />', () => {
     accSvc.getUserAccounts.mockResolvedValue(accounts);
     accSvc.getBanks.mockResolvedValue([]);
     getTx.mockResolvedValue(transactions);
+    alertsMock.mockResolvedValue([]);
   });
 
   it('carrega e exibe o saldo consolidado e o extrato', async () => {
@@ -90,6 +98,22 @@ describe('<Dashboard />', () => {
     fireEvent.click(screen.getByRole('button', { name: /Editar transação Salário/i }));
     fireEvent.click(await screen.findByRole('button', { name: 'Cancelar' }));
     expect(screen.getByRole('button', { name: 'Salvar Transação' })).toBeInTheDocument();
+  });
+
+  it('filtra o extrato pela busca de descrição (UC13)', async () => {
+    render(<Dashboard userId={1} userNameSession="Ana" />);
+    await screen.findByText('Salário');
+    expect(screen.getByText('Mercado')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Buscar transações'), { target: { value: 'Salário' } });
+    expect(screen.getByText('Salário')).toBeInTheDocument();
+    expect(screen.queryByText('Mercado')).not.toBeInTheDocument();
+  });
+
+  it('exibe banner de alerta de vencimento quando há pendências (UC19)', async () => {
+    alertsMock.mockResolvedValue([{ id: 9, description: 'Conta de luz', dueDate: '2026-06-01', overdue: false }]);
+    render(<Dashboard userId={1} userNameSession="Ana" />);
+    expect(await screen.findByText(/próxima\(s\) do vencimento/)).toBeInTheDocument();
   });
 
   it('vincula uma nova conta financeira', async () => {

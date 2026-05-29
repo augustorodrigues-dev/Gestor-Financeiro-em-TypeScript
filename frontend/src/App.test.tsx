@@ -35,8 +35,9 @@ describe('<App /> (fluxo de navegação)', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
     // Aparecem as abas de navegação do usuário logado
-    await waitFor(() => expect(screen.getAllByRole('tab', { name: 'Minhas Contas' }).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByRole('tab', { name: 'Contas' }).length).toBeGreaterThan(0));
     expect(screen.getAllByRole('tab', { name: 'Painel' }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('tab', { name: 'Metas' }).length).toBeGreaterThan(0);
   });
 
   it('troca para a aba Minhas Contas e faz logout', async () => {
@@ -50,10 +51,10 @@ describe('<App /> (fluxo de navegação)', () => {
     fireEvent.change(screen.getByLabelText('Senha'), { target: { value: '1234' } });
     fireEvent.click(screen.getByRole('button', { name: 'Entrar' }));
 
-    await waitFor(() => expect(screen.getAllByRole('tab', { name: 'Minhas Contas' }).length).toBeGreaterThan(0));
+    await waitFor(() => expect(screen.getAllByRole('tab', { name: 'Contas' }).length).toBeGreaterThan(0));
 
     // Troca para a tela de contas
-    fireEvent.click(screen.getAllByRole('tab', { name: 'Minhas Contas' })[0]);
+    fireEvent.click(screen.getAllByRole('tab', { name: 'Contas' })[0]);
     expect(await screen.findByText('Minhas Contas', { selector: 'h2' })).toBeInTheDocument();
 
     // Logout volta para o login

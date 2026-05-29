@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from '../services/transactionService';
+import { getUpcomingAlerts } from '../services/financeService';
 
 interface Bank {
   ispb: string;
@@ -21,6 +22,13 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   const [loadingData, setLoadingData] = useState(true);
 
   const [officialBanks, setOfficialBanks] = useState<Bank[]>([]);
+
+  // UC13 — filtro/busca no extrato
+  const [search, setSearch] = useState('');
+  const [filterType, setFilterType] = useState('ALL');
+
+  // UC19 — alertas de contas próximas ao vencimento
+  const [alerts, setAlerts] = useState<any[]>([]);
 
   const [editingTxId, setEditingTxId] = useState<number | null>(null);
   const [txDesc, setTxDesc] = useState('');
@@ -67,6 +75,17 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   };
 
   useEffect(() => { loadDashboardData(); }, [userId, userNameSession]);
+
+  useEffect(() => {
+    getUpcomingAlerts(7).then(data => setAlerts(Array.isArray(data) ? data : [])).catch(() => setAlerts([]));
+  }, [userId]);
+
+  // UC13 — aplica busca por descrição e filtro por tipo
+  const filteredTransactions = transactions.filter(tx => {
+    const matchesSearch = tx.description.toLowerCase().includes(search.toLowerCase());
+    const matchesType = filterType === 'ALL' || tx.type === filterType;
+    return matchesSearch && matchesType;
+  });
 
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,6 +171,12 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
         <p className="mt-1.5 text-sm text-brand-100">Aqui está o resumo financeiro das suas contas e despesas do mês.</p>
       </div>
 
+      {alerts.length > 0 && (
+        <div role="alert" className="rounded-xl border-l-4 border-warning-400 bg-warning-50 p-4 text-sm text-warning-800 animate-fade-in">
+          <strong>🔔 {alerts.length} conta(s) próxima(s) do vencimento.</strong> Verifique suas pendências para evitar atrasos.
+        </div>
+      )}
+
       <div className="rounded-xl border-l-4 border-success-500 bg-white p-6 shadow-card transition-shadow duration-200 hover:shadow-card-hover">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-neutral-500 sm:text-sm">Saldo Consolidado</h2>
         <p className={`mt-2 text-3xl font-bold tracking-tight sm:text-4xl ${balance >= 0 ? 'text-success-600' : 'text-danger-600'}`}>
@@ -231,16 +256,33 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
         </div>
 
         <div className="flex flex-col rounded-xl border border-neutral-200 bg-white shadow-card md:col-span-2">
-          <div className="border-b border-neutral-200 p-5"><h3 className="font-bold text-neutral-800">Extrato de Movimentações</h3></div>
+          <div className="border-b border-neutral-200 p-5">
+            <h3 className="mb-3 font-bold text-neutral-800">Extrato de Movimentações</h3>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <input
+                type="search"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                aria-label="Buscar transações"
+                placeholder="🔍 Buscar por descrição..."
+                className="flex-1 rounded-lg border border-neutral-300 p-2 text-sm text-neutral-900 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
+              />
+              <select value={filterType} onChange={e => setFilterType(e.target.value)} aria-label="Filtrar por tipo" className="rounded-lg border border-neutral-300 p-2 text-sm text-neutral-900 outline-none focus:border-brand-500">
+                <option value="ALL">Todos</option>
+                <option value="INCOME">Receitas</option>
+                <option value="EXPENSE">Despesas</option>
+              </select>
+            </div>
+          </div>
           <div className="scrollbar-thin max-h-[500px] overflow-y-auto p-0">
-            {transactions.length === 0 ? (
+            {filteredTransactions.length === 0 ? (
               <div className="flex flex-col items-center gap-2 p-10 text-center text-neutral-400">
                 <span className="text-3xl" aria-hidden="true">🗒️</span>
-                <p>Nenhuma transação registrada ainda.</p>
+                <p>{transactions.length === 0 ? 'Nenhuma transação registrada ainda.' : 'Nenhum resultado para o filtro.'}</p>
               </div>
             ) : (
               <ul className="divide-y divide-neutral-100">
-                {transactions.map(tx => (
+                {filteredTransactions.map(tx => (
                   <li key={tx.id} className={`group flex items-center justify-between p-4 transition-colors ${editingTxId === tx.id ? 'bg-warning-50' : 'hover:bg-neutral-50'}`}>
                     <div className="flex flex-col">
                       <span className="font-semibold text-neutral-800">{tx.description}</span>
