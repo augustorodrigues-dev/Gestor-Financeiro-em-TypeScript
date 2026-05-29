@@ -21,14 +21,12 @@ export default function Register({ onNavigateToLogin, onRegisterSuccess }: Regis
     try {
       const data = await registerUser({ name, email, password });
 
-      // Salva o Token JWT no localStorage para o início de sessão automático
       if (data.token) {
         localStorage.setItem('token', data.token);
       }
 
       alert('🎉 Conta criada com sucesso!');
 
-      // Acessando o objeto "user" que vem do back-end para carregar o Dashboard
       if (data.user && data.user.id) {
         onRegisterSuccess(data.user.id, data.user.name, data.user.role || 'USER');
       } else {

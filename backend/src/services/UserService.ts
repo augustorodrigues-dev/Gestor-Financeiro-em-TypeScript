@@ -10,7 +10,6 @@ export interface CreateUserDTO {
 
 export class UserService {
   
-  // 🚀 NOVO MÉTODO: Auxiliar para o Controller de Login (UC01)
   async getUserByEmail(email: string) {
     return await prisma.user.findUnique({
       where: { email }

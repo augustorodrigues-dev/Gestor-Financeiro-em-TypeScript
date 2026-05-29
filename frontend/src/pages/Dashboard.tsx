@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, deleteTransaction } from '../services/transactionService';
+import { goalService } from '../services/goalService'; // 🚀 Importado o serviço de metas
 
 interface DashboardProps {
   userId: number;
@@ -12,19 +13,26 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   const [balance, setBalance] = useState<number>(0);
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
+  const [goals, setGoals] = useState<any[]>([]); // 🚀 Estado para as metas
   const [loadingData, setLoadingData] = useState(true);
 
   const loadDashboardData = async () => {
     try {
       setLoadingData(true);
-      const [contas, transacoes] = await Promise.all([
+      
+      const [contas, transacoes, metas] = await Promise.all([
         accountService.getUserAccounts(),
-        getTransactions()
+        getTransactions(),
+        goalService.getGoals()
       ]);
 
       const listaContas = Array.isArray(contas) ? contas : [];
       setAccounts(listaContas);
       setTransactions(Array.isArray(transacoes) ? transacoes : []);
+      
+      if (metas && !metas.error) {
+        setGoals(Array.isArray(metas) ? metas : []);
+      }
       
       const saldoCalculado = listaContas.reduce((acc, conta) => acc + Number(conta.balance), 0);
       setBalance(saldoCalculado);
@@ -57,11 +65,52 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
         <p className="mt-2 text-brand-100">Aqui está o resumo financeiro das suas contas e despesas do mês.</p>
       </div>
 
-      <div className="rounded-xl border-l-4 border-success-500 bg-white p-6 shadow-card">
-        <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">Patrimônio Consolidado</h2>
-        <p className={`mt-2 text-4xl font-bold ${balance >= 0 ? 'text-success-600' : 'text-danger-600'}`}>
-          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance)}
-        </p>
+      {}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        {}
+        <div className="rounded-xl border-l-4 border-success-500 bg-white p-6 shadow-card flex flex-col justify-center">
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">Patrimônio Consolidado</h2>
+          <p className={`mt-2 text-4xl font-bold ${balance >= 0 ? 'text-success-600' : 'text-danger-600'}`}>
+            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(balance)}
+          </p>
+        </div>
+
+        {}
+        <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-card">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="font-bold text-neutral-800">🎯 Progresso das Metas</h3>
+            {}
+            <span className="text-sm font-medium text-blue-600">Top 3 ativas</span>
+          </div>
+          
+          {goals.length === 0 ? (
+            <p className="text-sm text-neutral-500 py-4 text-center">Nenhuma meta ativa no momento.</p>
+          ) : (
+            <div className="space-y-4">
+              {goals.slice(0, 3).map(goal => (
+                <div key={goal.id}>
+                  <div className="flex justify-between text-sm mb-1">
+                    <span className="font-semibold text-neutral-700 truncate pr-2">{goal.name}</span>
+                    <span className="text-neutral-600 font-bold">{goal.progressPercentage}%</span>
+                  </div>
+                  
+                  <div className="w-full bg-neutral-200 rounded-full h-2 overflow-hidden">
+                    <div 
+                      className={`h-2 transition-all duration-500 ease-out ${goal.isCompleted ? 'bg-success-500' : 'bg-blue-500'}`} 
+                      style={{ width: `${Math.min(goal.progressPercentage, 100)}%` }}
+                    ></div>
+                  </div>
+                  
+                  <p className="text-xs text-neutral-500 text-right mt-1">
+                    R$ {Number(goal.currentAmount).toFixed(2)} / R$ {Number(goal.targetAmount).toFixed(2)}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
       </div>
 
       <div className="rounded-xl border border-neutral-200 bg-white shadow-card">

@@ -6,7 +6,7 @@ export class CreditCardService {
     return await prisma.creditCard.create({
       data: {
         name: data.name,
-        limitAmount: data.limitAmount, // 🚀 Ajustado para o nome do seu schema
+        limitAmount: data.limitAmount, 
         closingDay: data.closingDay,
         dueDay: data.dueDay,
         userId: data.userId

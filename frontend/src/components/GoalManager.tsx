@@ -7,7 +7,6 @@ export function GoalManager() {
   const [targetAmount, setTargetAmount] = useState('');
   const [deadline, setDeadline] = useState('');
 
-  // Carrega as metas ao abrir a tela
   useEffect(() => {
     loadGoals();
   }, []);
@@ -15,7 +14,6 @@ export function GoalManager() {
   const loadGoals = () => {
     goalService.getGoals()
       .then((data) => {
-        // Se a API retornar um erro em vez do array, tratamos aqui
         if (data && data.error) {
           console.error("Erro da API:", data.error);
           return;
@@ -25,24 +23,20 @@ export function GoalManager() {
       .catch(err => console.error("Erro na conexão ao carregar metas:", err));
   };
 
-  // Função para criar nova meta
   const handleCreateGoal = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      // Guarda a resposta do back-end em uma variável
       const response = await goalService.createGoal({
         name,
         targetAmount: Number(targetAmount),
         deadline
       });
 
-      // 🚀 SEGREDO REVELADO: Verifica se o back-end mandou um aviso de erro
       if (response && response.error) {
         alert(`❌ O servidor recusou a criação:\n${response.error}`);
-        return; // Para a execução aqui, não limpa os campos
+        return; 
       }
 
-      // Limpa o formulário e recarrega a lista se deu tudo certo
       setName('');
       setTargetAmount('');
       setDeadline('');
@@ -53,7 +47,6 @@ export function GoalManager() {
     }
   };
 
-  // Função para registrar um aporte (Update)
   const handleAddProgress = async (goal: any) => {
     const value = window.prompt(`Quanto você quer investir na meta "${goal.name}" agora?`);
     
@@ -76,7 +69,6 @@ export function GoalManager() {
     }
   };
 
-  // Função para excluir meta (Delete)
   const handleDeleteGoal = async (id: number) => {
     if (window.confirm('Tem certeza que deseja cancelar esta meta?')) {
       try {
@@ -98,7 +90,7 @@ export function GoalManager() {
     <div className="p-6 max-w-4xl mx-auto">
       <h2 className="text-3xl font-bold text-gray-800 mb-6">🎯 Metas Financeiras</h2>
       
-      {/* Formulário de Criação com Tailwind */}
+      {}
       <div className="bg-white p-6 rounded-lg shadow-md mb-8 border border-gray-200">
         <h3 className="text-xl font-semibold mb-4 text-gray-700">Criar Nova Meta</h3>
         <form onSubmit={handleCreateGoal} className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -119,7 +111,7 @@ export function GoalManager() {
             <input 
               type="number" 
               required
-              step="0.01" // Permite valores com centavos
+              step="0.01" 
               placeholder="15000" 
               className="p-2 border rounded focus:ring-2 focus:ring-blue-500 outline-none"
               value={targetAmount}
@@ -149,7 +141,7 @@ export function GoalManager() {
         </form>
       </div>
 
-      {/* Listagem das Metas */}
+      {}
       <div className="grid grid-cols-1 gap-6">
         {goals.map(goal => (
           <div key={goal.id} className="bg-white p-6 border rounded-lg shadow-sm hover:shadow-md transition-shadow">
@@ -164,7 +156,7 @@ export function GoalManager() {
               Progresso: <span className="font-semibold text-green-600">R$ {goal.currentAmount}</span> de R$ {goal.targetAmount}
             </p>
             
-            {/* Barra de Progresso */}
+            {}
             <div className="w-full bg-gray-200 rounded-full h-4 mb-2 overflow-hidden">
               <div 
                 className={`h-4 transition-all duration-500 ease-out ${goal.isCompleted ? 'bg-green-500' : 'bg-blue-500'}`} 

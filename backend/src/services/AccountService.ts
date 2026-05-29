@@ -46,7 +46,6 @@ export class AccountService {
   }
 
   async deleteAccount(accountId: number, userId: number) {
-    // Busca a conta e verifica quantas transações ela tem
     const account = await prisma.account.findFirst({
       where: { id: accountId, userId: userId },
       include: { 
