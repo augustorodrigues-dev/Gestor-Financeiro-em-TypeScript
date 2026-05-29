@@ -31,7 +31,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
       localStorage.setItem('token', data.token);
 
       onLoginSuccess(data.user.id, data.user.name, data.user.role);
-      
+
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -45,43 +45,52 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
   };
 
   return (
-    <div className="flex flex-col justify-center py-6 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <h2 className="text-center text-3xl font-extrabold text-gray-900">
-          Entrar no FinanceFlow
+    <div className="flex flex-col justify-center py-6 px-4 sm:px-6 lg:px-8 animate-fade-in-up">
+      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-brand text-2xl shadow-glow">
+          💸
+        </div>
+        <h2 className="text-3xl font-extrabold tracking-tight text-neutral-900">
+          Entrar no <span className="text-gradient">FinanceFlow</span>
         </h2>
+        <p className="mt-2 text-sm text-neutral-500">
+          Gerencie suas contas e despesas em um só lugar.
+        </p>
       </div>
 
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10 border border-gray-200">
-          
+        <div className="rounded-xl2 border border-neutral-200 bg-white px-4 py-8 shadow-soft sm:px-10">
+
           {error && (
-            <div className="mb-4 bg-red-50 border-l-4 border-red-400 p-4 text-sm text-red-700">
-              {error}
+            <div role="alert" className="mb-4 flex items-start gap-2 rounded-lg border-l-4 border-danger-400 bg-danger-50 p-4 text-sm text-danger-700 animate-fade-in">
+              <span aria-hidden="true">⚠️</span>
+              <span>{error}</span>
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700">E-mail</label>
+              <label htmlFor="login-email" className="block text-sm font-semibold text-neutral-700">E-mail</label>
               <input
+                id="login-email"
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900"
+                className="mt-1.5 block w-full rounded-lg border border-neutral-300 p-2.5 text-neutral-900 placeholder-neutral-400 shadow-sm outline-none transition-colors duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
                 placeholder="exemplo@email.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700">Senha</label>
+              <label htmlFor="login-password" className="block text-sm font-semibold text-neutral-700">Senha</label>
               <input
+                id="login-password"
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-900"
+                className="mt-1.5 block w-full rounded-lg border border-neutral-300 p-2.5 text-neutral-900 placeholder-neutral-400 shadow-sm outline-none transition-colors duration-200 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/30"
                 placeholder="********"
               />
             </div>
@@ -89,35 +98,35 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors font-bold"
+              className="flex w-full items-center justify-center rounded-lg border border-transparent bg-brand-600 px-4 py-2.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-brand-700 hover:shadow-card-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
 
           {}
-          <div className="mt-8 pt-6 border-t border-gray-200">
-            <p className="text-sm text-center text-gray-500 mb-4 font-medium">
+          <div className="mt-8 border-t border-neutral-200 pt-6">
+            <p className="mb-4 text-center text-xs font-semibold uppercase tracking-wider text-neutral-400">
               Acesso Rápido
             </p>
             <div className="flex flex-col gap-3">
-              <div className="flex gap-3">
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   onClick={() => performLogin('jadao@gmail.com', '1234')}
-                  className="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-blue-200"
+                  className="w-full rounded-lg border border-brand-200 bg-brand-50 px-4 py-2 text-sm font-semibold text-brand-700 transition-all duration-200 hover:bg-brand-100 hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-1"
                 >
                   💸 Jadão o Liso
                 </button>
                 <button
                   onClick={() => performLogin('nando@gmail.com', '1234')}
-                  className="w-full bg-purple-50 hover:bg-purple-100 text-purple-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-purple-200"
+                  className="w-full rounded-lg border border-purple-200 bg-purple-50 px-4 py-2 text-sm font-semibold text-purple-700 transition-all duration-200 hover:bg-purple-100 hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-purple-500 focus-visible:ring-offset-1"
                 >
                   🐳 DevOps Nando
                 </button>
               </div>
               <button
                 onClick={() => performLogin('alexandra@gmail.com', '1234')}
-                className="w-full bg-red-50 hover:bg-red-100 text-red-700 font-semibold py-2 px-4 rounded text-sm transition-colors border border-red-200 uppercase tracking-wider"
+                className="w-full rounded-lg border border-danger-200 bg-danger-50 px-4 py-2 text-sm font-semibold uppercase tracking-wider text-danger-700 transition-all duration-200 hover:bg-danger-100 hover:shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-danger-500 focus-visible:ring-offset-1"
               >
                 👑 Entrar como Admin (Alexandra)
               </button>
@@ -127,7 +136,7 @@ export default function Login({ onLoginSuccess, onNavigateToRegister }: LoginPro
           <div className="mt-6 text-center">
             <button
               onClick={onNavigateToRegister}
-              className="text-sm font-medium text-blue-600 hover:text-blue-500"
+              className="rounded text-sm font-semibold text-brand-600 transition-colors hover:text-brand-500 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2"
             >
               Não tem uma conta? Cadastre-se aqui
             </button>
