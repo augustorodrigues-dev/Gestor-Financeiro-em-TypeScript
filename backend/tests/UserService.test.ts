@@ -8,7 +8,7 @@ jest.mock('../src/prisma', () => ({
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn(),
+      delete: jest.fn(), // <--- Certifique-se de que este está aqui!
     },
     transaction: {
       deleteMany: jest.fn(),
@@ -75,5 +75,11 @@ describe('Testes Unitários: UserService', () => {
     expect(prisma.transaction.deleteMany).toHaveBeenCalledTimes(1);
     expect(prisma.account.deleteMany).toHaveBeenCalledTimes(1);
     expect(prisma.user.delete).toHaveBeenCalledWith({ where: { id: userId } });
+  });
+  it('4. Deve disparar erro caso o prisma falhe ao deletar', async () => {
+    const userId = 999;
+    (prisma.user.delete as jest.Mock).mockRejectedValue(new Error("Erro de banco de dados"));
+
+    await expect(userService.deleteUser(userId)).rejects.toThrow("Erro de banco de dados");
   });
 });

@@ -57,4 +57,34 @@ describe('Testes Unitários: TransactionService', () => {
     await transactionService.createTransaction(payload);
     expect(prisma.$transaction).toHaveBeenCalled();
   });
+
+  it('3. Deve lançar erro ao tentar deletar uma transação inexistente', async () => {
+    // Simula que a busca no banco retorna nulo
+    (prisma.transaction.findUnique as jest.Mock).mockResolvedValue(null);
+
+    await expect(transactionService.deleteTransaction(999)).rejects.toThrow("Transação não encontrada.");
+  });
+
+  it('4. Deve ajustar o saldo corretamente ao deletar uma transação de RECEITA', async () => {
+    const mockTransacao = {
+      id: 1,
+      accountId: 1,
+      type: 'INCOME',
+      amount: 100.00,
+      creditCardId: null
+    };
+
+    (prisma.transaction.findUnique as jest.Mock).mockResolvedValue(mockTransacao);
+    // Simula sucesso na deleção e no update do saldo
+    (prisma.$transaction as jest.Mock).mockResolvedValue([mockTransacao, { count: 1 }]);
+
+    await transactionService.deleteTransaction(1);
+
+    // Verifica se o valor passado ao update do saldo foi negativo (reversão de receita)
+    expect(prisma.account.update).toHaveBeenCalledWith(
+      expect.objectContaining({
+        data: { balance: { increment: -100.00 } }
+      })
+    );
+  });
 });

@@ -9,7 +9,7 @@ interface CategoryDTO {
 
 export class CategoryService {
   async createCategory(userId: number, data: CategoryDTO) {
-    const category = await prisma.category.create({
+    return await prisma.category.create({
       data: {
         name: data.name,
         type: data.type,
@@ -19,11 +19,10 @@ export class CategoryService {
         userId: userId,
       },
     });
-    return category;
   }
 
   async getCategories(userId: number) {
-    const categories = await prisma.category.findMany({
+    return await prisma.category.findMany({
       where: {
         OR: [
           { isDefault: true }, 
@@ -34,7 +33,6 @@ export class CategoryService {
         name: 'asc'
       }
     });
-    return categories;
   }
 
   async updateCategory(categoryId: number, userId: number, data: CategoryDTO) {
@@ -50,7 +48,7 @@ export class CategoryService {
       throw new Error('Categorias padrão do sistema não podem ser alteradas.');
     }
 
-    const updatedCategory = await prisma.category.update({
+    return await prisma.category.update({
       where: { id: categoryId },
       data: {
         name: data.name,
@@ -59,8 +57,6 @@ export class CategoryService {
         icon: data.icon,
       },
     });
-
-    return updatedCategory;
   }
 
   async deleteCategory(categoryId: number, userId: number) {
@@ -76,10 +72,9 @@ export class CategoryService {
       throw new Error('Categorias padrão não podem ser removidas.');
     }
 
-    await prisma.category.delete({
+    // Retorna o objeto deletado, permitindo que o teste acesse .id
+    return await prisma.category.delete({
       where: { id: categoryId },
     });
-
-    return { message: 'Categoria personalizada removida com sucesso.' };
   }
 }

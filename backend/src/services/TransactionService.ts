@@ -2,31 +2,39 @@ import { prisma } from '../prisma';
 
 export class TransactionService {
   
-  async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date | string; creditCardId?: number | null }) {
-    
-    const finalType = data.creditCardId ? 'EXPENSE' : data.type;
 
-    const amountToUpdate = data.creditCardId ? 0 : (finalType === 'INCOME' ? data.amount : -data.amount);
+async createTransaction(data: { 
+  amount: number; 
+  description: string; 
+  type: string; 
+  accountId: number; 
+  categoryId?: number; 
+  date: Date | string; 
+  creditCardId?: number | null 
+}) {
+  const finalType = data.creditCardId ? 'EXPENSE' : data.type;
+  const amountToUpdate = data.creditCardId ? 0 : (finalType === 'INCOME' ? data.amount : -data.amount);
 
-    const [newTransaction] = await prisma.$transaction([
-      prisma.transaction.create({
-        data: {
-          amount: data.amount,
-          description: data.description,
-          type: finalType,
-          accountId: data.accountId,
-          date: new Date(data.date),
-          creditCardId: data.creditCardId ? Number(data.creditCardId) : null
-        }
-      }),
-      prisma.account.update({
-        where: { id: data.accountId },
-        data: { balance: { increment: amountToUpdate } }
-      })
-    ]);
+  const [newTransaction] = await prisma.$transaction([
+    prisma.transaction.create({
+      data: {
+        amount: data.amount,
+        description: data.description,
+        type: finalType,
+        accountId: data.accountId,
+        categoryId: data.categoryId || null, // Se não vier nada, salva como null
+        date: new Date(data.date),
+        creditCardId: data.creditCardId ? Number(data.creditCardId) : null
+      }
+    }),
+    prisma.account.update({
+      where: { id: data.accountId },
+      data: { balance: { increment: amountToUpdate } }
+    })
+  ]);
 
-    return newTransaction;
-  }
+  return newTransaction;
+}
 
   async getTransactionsByUser(userId: number) {
     return await prisma.transaction.findMany({

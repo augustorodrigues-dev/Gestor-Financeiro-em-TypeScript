@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
     "test": "jest",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage --coverageReporters=\"lcov\" --coverageDirectory=\"coverage\""
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.8.0",

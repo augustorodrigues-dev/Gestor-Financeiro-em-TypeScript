@@ -7,7 +7,6 @@ const userService = new UserService();
 
 export class UserController {
   
-  // 🚀 NOVO MÉTODO: Autenticar Usuário (UC01)
   async login(req: Request, res: Response) {
     try {
       const { email, password } = req.body;
@@ -16,19 +15,16 @@ export class UserController {
         return res.status(400).json({ error: "E-mail e senha são obrigatórios." });
       }
 
-      // Busca o usuário no banco pelo e-mail
       const user = await userService.getUserByEmail(email); 
       if (!user) {
         return res.status(401).json({ error: "E-mail ou senha inválidos." });
       }
 
-      // Compara o hash da senha usando bcrypt
       const passwordMatch = await bcrypt.compare(password, user.passwordHash);
       if (!passwordMatch) {
         return res.status(401).json({ error: "E-mail ou senha inválidos." });
       }
 
-      // Gera o Token JWT com o ID e o papel (Role) do usuário
       const token = jwt.sign(
         { id: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret_padrao_aqui',
