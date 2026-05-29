@@ -5,7 +5,8 @@ import transactionRoutes from './routes/transaction.routes';
 import accountRoutes from './routes/account.routes';
 import userRoutes from './routes/user.routes'; 
 import creditCardRoutes from './routes/creditCard.routes';
-import goalRoutes from './routes/goal.routes'; 
+import goalRoutes from './routes/goal.routes';
+import categoryRoutes from './routes/category.routes';
 import { prisma } from './prisma'; 
 
 const app = express();
@@ -26,7 +27,8 @@ app.use('/api/transactions', transactionRoutes);
 app.use('/api/accounts', accountRoutes); 
 app.use('/api/users', userRoutes);
 app.use('/api/credit-cards', creditCardRoutes);
-app.use('/api/goals', goalRoutes); 
+app.use('/api/goals', goalRoutes);
+app.use('/api/categories', categoryRoutes); 
 
 app.get('/api/balance/user/:userId', async (req, res) => {
   try {

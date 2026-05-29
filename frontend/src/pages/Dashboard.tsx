@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, deleteTransaction } from '../services/transactionService';
-import { goalService } from '../services/goalService'; // 🚀 Importado o serviço de metas
+import { goalService } from '../services/goalService';
+import { categoryService } from '../services/categoryService'; // 🚀 Importado
 
 interface DashboardProps {
   userId: number;
@@ -13,27 +14,30 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   const [balance, setBalance] = useState<number>(0);
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
-  const [goals, setGoals] = useState<any[]>([]); // 🚀 Estado para as metas
+  const [goals, setGoals] = useState<any[]>([]);
+  const [categories, setCategories] = useState<any[]>([]); // 🚀 Estado para categorias
   const [loadingData, setLoadingData] = useState(true);
 
   const loadDashboardData = async () => {
     try {
       setLoadingData(true);
       
-      const [contas, transacoes, metas] = await Promise.all([
+      const [contas, transacoes, metas, listaCategorias] = await Promise.all([
         accountService.getUserAccounts(),
         getTransactions(),
-        goalService.getGoals()
+        goalService.getGoals(),
+        categoryService.getCategories()
       ]);
 
-      const listaContas = Array.isArray(contas) ? contas : [];
-      setAccounts(listaContas);
+      setAccounts(Array.isArray(contas) ? contas : []);
       setTransactions(Array.isArray(transacoes) ? transacoes : []);
+      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []); // 🚀 Carregado
       
       if (metas && !metas.error) {
         setGoals(Array.isArray(metas) ? metas : []);
       }
       
+      const listaContas = Array.isArray(contas) ? contas : [];
       const saldoCalculado = listaContas.reduce((acc, conta) => acc + Number(conta.balance), 0);
       setBalance(saldoCalculado);
       setUserName(userNameSession || "Usuário");
@@ -65,10 +69,7 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
         <p className="mt-2 text-brand-100">Aqui está o resumo financeiro das suas contas e despesas do mês.</p>
       </div>
 
-      {}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        {}
         <div className="rounded-xl border-l-4 border-success-500 bg-white p-6 shadow-card flex flex-col justify-center">
           <h2 className="text-sm font-semibold uppercase tracking-wider text-neutral-500">Patrimônio Consolidado</h2>
           <p className={`mt-2 text-4xl font-bold ${balance >= 0 ? 'text-success-600' : 'text-danger-600'}`}>
@@ -76,11 +77,9 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
           </p>
         </div>
 
-        {}
         <div className="rounded-xl border border-neutral-200 bg-white p-6 shadow-card">
           <div className="flex justify-between items-center mb-4">
             <h3 className="font-bold text-neutral-800">🎯 Progresso das Metas</h3>
-            {}
             <span className="text-sm font-medium text-blue-600">Top 3 ativas</span>
           </div>
           
@@ -94,52 +93,40 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
                     <span className="font-semibold text-neutral-700 truncate pr-2">{goal.name}</span>
                     <span className="text-neutral-600 font-bold">{goal.progressPercentage}%</span>
                   </div>
-                  
                   <div className="w-full bg-neutral-200 rounded-full h-2 overflow-hidden">
-                    <div 
-                      className={`h-2 transition-all duration-500 ease-out ${goal.isCompleted ? 'bg-success-500' : 'bg-blue-500'}`} 
-                      style={{ width: `${Math.min(goal.progressPercentage, 100)}%` }}
-                    ></div>
+                    <div className="h-2 transition-all duration-500 ease-out bg-blue-500" style={{ width: `${Math.min(goal.progressPercentage, 100)}%` }}></div>
                   </div>
-                  
-                  <p className="text-xs text-neutral-500 text-right mt-1">
-                    R$ {Number(goal.currentAmount).toFixed(2)} / R$ {Number(goal.targetAmount).toFixed(2)}
-                  </p>
                 </div>
               ))}
             </div>
           )}
         </div>
-
       </div>
 
       <div className="rounded-xl border border-neutral-200 bg-white shadow-card">
         <div className="border-b border-neutral-200 p-5"><h3 className="font-bold text-neutral-800">Extrato de Movimentações</h3></div>
-        <div className="scrollbar-thin max-h-[500px] overflow-y-auto p-0">
-          {transactions.length === 0 ? (
-            <div className="p-10 text-center text-neutral-400">Nenhuma transação registrada ainda.</div>
-          ) : (
-            <ul className="divide-y divide-neutral-100">
-              {transactions.map(tx => (
-                <li key={tx.id} className="group flex items-center justify-between p-4 transition-colors hover:bg-neutral-50">
-                  <div className="flex flex-col">
-                    <span className="font-semibold text-neutral-800">{tx.description}</span>
-                    <span className="text-xs text-neutral-500">
-                      {new Date(tx.date).toLocaleDateString('pt-BR')} • {accounts.find(a => a.id === tx.accountId)?.name || 'Conta'}
-                      {tx.creditCard && <span className="ml-2 font-medium text-purple-600">💳 {tx.creditCard.name}</span>}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className={`font-bold ${tx.type === 'INCOME' ? 'text-success-600' : 'text-danger-600'}`}>
-                      {tx.type === 'INCOME' ? '+' : '-'} R$ {Number(tx.amount).toFixed(2)}
-                    </span>
-                    <button onClick={() => handleDeleteTransaction(tx.id)} className="opacity-0 group-hover:opacity-100 rounded p-1.5 text-neutral-400 hover:bg-danger-50 hover:text-danger-600 transition-all">🗑️</button>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <ul className="divide-y divide-neutral-100">
+          {transactions.map(tx => {
+            const categoria = categories.find(c => c.id === tx.categoryId);
+            return (
+              <li key={tx.id} className="group flex items-center justify-between p-4 hover:bg-neutral-50">
+                <div className="flex flex-col">
+                  <span className="font-semibold text-neutral-800">{tx.description}</span>
+                  <span className="text-xs text-neutral-500">
+                    {new Date(tx.date).toLocaleDateString('pt-BR')} • {accounts.find(a => a.id === tx.accountId)?.name || 'Conta'}
+                    {categoria && <span className="ml-2 font-medium" style={{ color: categoria.color }}>🏷️ {categoria.name}</span>}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className={`font-bold ${tx.type === 'INCOME' ? 'text-success-600' : 'text-danger-600'}`}>
+                    {tx.type === 'INCOME' ? '+' : '-'} R$ {Number(tx.amount).toFixed(2)}
+                  </span>
+                  <button onClick={() => handleDeleteTransaction(tx.id)} className="opacity-0 group-hover:opacity-100 rounded p-1.5 text-red-400 hover:text-red-600 transition-all">🗑️</button>
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       </div>
     </div>
   );

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 import { createTransaction } from '../services/transactionService';
 import { creditCardService } from '../services/creditCardService';
+import { categoryService } from '../services/categoryService'; // 🚀 Importado
 import CreditCardManager from '../components/CreditCardManager';
 
 interface Bank {
@@ -18,6 +19,7 @@ export default function Wallet({ userId }: WalletProps) {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [creditCards, setCreditCards] = useState<any[]>([]);
   const [officialBanks, setOfficialBanks] = useState<Bank[]>([]);
+  const [categories, setCategories] = useState<any[]>([]); // 🚀 Estado de categorias
 
   // Estados da Transação
   const [txDesc, setTxDesc] = useState('');
@@ -25,24 +27,26 @@ export default function Wallet({ userId }: WalletProps) {
   const [txType, setTxType] = useState('EXPENSE');
   const [txAccountId, setTxAccountId] = useState('');
   const [txCreditCardId, setTxCreditCardId] = useState('');
+  const [txCategoryId, setTxCategoryId] = useState(''); 
   const [txDate, setTxDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // Estados da Conta
   const [selectedBankName, setSelectedBankName] = useState('');
   const [accountType, setAccountType] = useState('CORRENTE');
 
   const loadWalletData = async () => {
     try {
-      const [contas, bancosFiltro, cartoes] = await Promise.all([
+      const [contas, bancosFiltro, cartoes, listaCategorias] = await Promise.all([
         accountService.getUserAccounts(),
         accountService.getBanks(),
-        creditCardService.getCards()
+        creditCardService.getCards(),
+        categoryService.getCategories() 
       ]);
-
-      const listaContas = Array.isArray(contas) ? contas : [];
+     const listaContas = Array.isArray(contas) ? contas : [];
+      
       setAccounts(listaContas);
       setOfficialBanks(Array.isArray(bancosFiltro) ? bancosFiltro.filter((b: Bank) => b.name) : []);
       setCreditCards(Array.isArray(cartoes) ? cartoes : []);
+      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []);
 
       if (listaContas.length > 0 && !txAccountId) {
         setTxAccountId(listaContas[0].id.toString());
@@ -57,6 +61,7 @@ export default function Wallet({ userId }: WalletProps) {
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!txAccountId) return alert("Crie uma conta primeiro!");
+    if (!txCategoryId) return alert("Selecione uma categoria!"); 
 
     const payload = {
       description: txDesc,
@@ -64,13 +69,14 @@ export default function Wallet({ userId }: WalletProps) {
       type: txType,
       accountId: Number(txAccountId),
       creditCardId: txCreditCardId ? Number(txCreditCardId) : null,
+      categoryId: Number(txCategoryId), 
       date: new Date(txDate).toISOString(),
     };
 
     try {
       await createTransaction(payload);
       alert('✅ Transação registrada com sucesso!');
-      setTxDesc(''); setTxAmount(''); setTxCreditCardId('');
+      setTxDesc(''); setTxAmount(''); setTxCreditCardId(''); setTxCategoryId('');
       loadWalletData();
     } catch (error: any) { alert(error.message); }
   };
@@ -101,7 +107,6 @@ export default function Wallet({ userId }: WalletProps) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        {/* Formulário de Transação */}
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-card">
           <h3 className="mb-4 font-bold text-neutral-800">Nova Transação</h3>
           <form onSubmit={handleSaveTransaction} className="space-y-4">
@@ -119,6 +124,11 @@ export default function Wallet({ userId }: WalletProps) {
               {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} (Saldo base)</option>)}
             </select>
 
+            <select value={txCategoryId} onChange={e => setTxCategoryId(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" required>
+              <option value="">Selecione uma categoria...</option>
+              {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
+            </select>
+
             <select value={txCreditCardId} onChange={e => { setTxCreditCardId(e.target.value); if (e.target.value) setTxType('EXPENSE'); }} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500">
               <option value="">Débito / PIX / Dinheiro Vivo</option>
               {creditCards.map(card => <option key={card.id} value={card.id}>💳 {card.name}</option>)}
@@ -130,7 +140,6 @@ export default function Wallet({ userId }: WalletProps) {
           </form>
         </div>
 
-        {/* Formulário de Conta */}
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-card">
           <h3 className="mb-4 font-bold text-neutral-800">Vincular Conta Financeira</h3>
           <form onSubmit={handleCreateAccount} className="space-y-4">
@@ -156,8 +165,6 @@ export default function Wallet({ userId }: WalletProps) {
           </form>
         </div>
       </div>
-
-      {/* Gerenciador de Cartões */}
       <CreditCardManager cards={creditCards} onUpdate={loadWalletData} />
     </div>
   );

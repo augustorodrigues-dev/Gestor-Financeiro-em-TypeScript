@@ -4,18 +4,18 @@ import Wallet from './pages/Wallet';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel'; 
-import { GoalManager } from './components/GoalManager'; // 🚀 Importação da nova tela de Metas
+import { GoalManager } from './components/GoalManager';
+import { CategoryManager } from './components/CategoryManager'; // 🚀 Importação da nova tela
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
   
-  // 🚀 Estado atualizado para incluir a aba 'goals'
-  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals'>('dashboard');
+  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals' | 'categories'>('dashboard');
 
   const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
     setUserSession({ id, name, role });
-    setCurrentView('dashboard'); // Reseta para o Dashboard ao fazer login
+    setCurrentView('dashboard');
   };
 
   const handleLogout = () => {
@@ -28,67 +28,47 @@ export default function App() {
     <div className="min-h-screen bg-gray-100 font-sans">
       <nav className="bg-blue-600 p-4 text-white flex justify-between items-center shadow-md">
         
-        {/* Lado Esquerdo: Logo e Menu de Navegação */}
         <div className="flex items-center gap-6">
           <h1 className="text-xl font-bold tracking-wide">FinanceFlow 💸</h1>
           
-          {/* Menu visível apenas para Usuários Comuns Logados */}
           {userSession && userSession.role !== 'ADMIN' && (
             <div className="hidden sm:flex gap-2 bg-blue-700/50 p-1 rounded-lg">
               <button 
                 onClick={() => setCurrentView('dashboard')}
                 className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
-                  currentView === 'dashboard' 
-                    ? 'bg-white text-blue-700 shadow-sm' 
-                    : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                  currentView === 'dashboard' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
                 }`}
-              >
-                📊 Dashboard
-              </button>
+              >📊 Dashboard</button>
               
               <button 
                 onClick={() => setCurrentView('wallet')}
                 className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
-                  currentView === 'wallet' 
-                    ? 'bg-white text-blue-700 shadow-sm' 
-                    : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                  currentView === 'wallet' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
                 }`}
-              >
-                💼 Carteira
-              </button>
+              >💼 Carteira</button>
 
-              {/* 🚀 Novo Botão da aba Metas */}
               <button 
                 onClick={() => setCurrentView('goals')}
                 className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
-                  currentView === 'goals' 
-                    ? 'bg-white text-blue-700 shadow-sm' 
-                    : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                  currentView === 'goals' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
                 }`}
-              >
-                🎯 Metas
-              </button>
+              >🎯 Metas</button>
+
+              {}
+              <button 
+                onClick={() => setCurrentView('categories')}
+                className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
+                  currentView === 'categories' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                }`}
+              >🏷️ Categorias</button>
             </div>
           )}
         </div>
 
-        {/* Lado Direito: Info do Usuário e Logout */}
         {userSession && (
           <div className="flex items-center gap-4">
-            <span className="text-sm opacity-90">
-              Olá, <strong>{userSession.name}</strong>
-              {userSession.role === 'ADMIN' && (
-                <span className="ml-2 bg-red-500 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                  Admin
-                </span>
-              )}
-            </span>
-            <button 
-              onClick={handleLogout}
-              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded text-sm transition-colors shadow-sm"
-            >
-              Sair
-            </button>
+            <span className="text-sm opacity-90">Olá, <strong>{userSession.name}</strong></span>
+            <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 text-white font-semibold py-1.5 px-4 rounded text-sm transition-colors shadow-sm">Sair</button>
           </div>
         )}
       </nav>
@@ -98,25 +78,15 @@ export default function App() {
           userSession.role === 'ADMIN' ? (
             <AdminPanel />
           ) : (
-            // 🚀 Condicional atualizada para renderizar as 3 visualizações do usuário comum
-            currentView === 'dashboard' ? (
-              <Dashboard userId={userSession.id} userNameSession={userSession.name} />
-            ) : currentView === 'wallet' ? (
-              <Wallet userId={userSession.id} />
-            ) : (
-              <GoalManager />
-            )
+            currentView === 'dashboard' ? <Dashboard userId={userSession.id} userNameSession={userSession.name} /> :
+            currentView === 'wallet' ? <Wallet userId={userSession.id} /> :
+            currentView === 'goals' ? <GoalManager /> :
+            <CategoryManager />
           )
         ) : authMode === 'login' ? (
-          <Login 
-            onLoginSuccess={handleAuthSuccess} 
-            onNavigateToRegister={() => setAuthMode('register')} 
-          />
+          <Login onLoginSuccess={handleAuthSuccess} onNavigateToRegister={() => setAuthMode('register')} />
         ) : (
-          <Register 
-            onRegisterSuccess={handleAuthSuccess} 
-            onNavigateToLogin={() => setAuthMode('login')} 
-          />
+          <Register onRegisterSuccess={handleAuthSuccess} onNavigateToLogin={() => setAuthMode('login')} />
         )}
       </main>
     </div>
