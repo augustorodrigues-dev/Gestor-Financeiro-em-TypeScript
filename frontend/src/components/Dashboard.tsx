@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, createTransaction, deleteTransaction, updateTransaction } from '../services/transactionService';
+import CreditCardManager from './CreditCardManager'; 
 
 interface Bank {
   ispb: string;
@@ -38,7 +39,7 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
 
       const [contas, transacoes, bancosFiltro] = await Promise.all([
         accountService.getUserAccounts(),
-        getTransactions(), // O token no transactionService faz o trabalho sujo
+        getTransactions(),
         accountService.getBanks()
       ]);
 
@@ -261,6 +262,10 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
         </div>
 
       </div>
+
+      {}
+      <CreditCardManager />
+
     </div>
   );
 }
