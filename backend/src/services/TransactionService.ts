@@ -2,17 +2,21 @@ import { prisma } from '../prisma';
 
 export class TransactionService {
   
-  async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date }) {
-    const amountToUpdate = data.type === 'INCOME' ? data.amount : -data.amount;
+  async createTransaction(data: { amount: number; description: string; type: string; accountId: number; date: Date | string; creditCardId?: number | null }) {
+    
+    const finalType = data.creditCardId ? 'EXPENSE' : data.type;
+
+    const amountToUpdate = data.creditCardId ? 0 : (finalType === 'INCOME' ? data.amount : -data.amount);
 
     const [newTransaction] = await prisma.$transaction([
       prisma.transaction.create({
         data: {
           amount: data.amount,
           description: data.description,
-          type: data.type,
+          type: finalType,
           accountId: data.accountId,
-          date: data.date
+          date: new Date(data.date),
+          creditCardId: data.creditCardId ? Number(data.creditCardId) : null
         }
       }),
       prisma.account.update({
@@ -34,6 +38,9 @@ export class TransactionService {
       include: {
         account: {
           select: { name: true, type: true } 
+        },
+        creditCard: {
+          select: { name: true } 
         }
       },
       orderBy: {
@@ -43,21 +50,44 @@ export class TransactionService {
   }
 
   async updateTransaction(id: number, data: any) {
+    const finalType = data.creditCardId ? 'EXPENSE' : data.type;
+
     return await prisma.transaction.update({
       where: { id },
       data: {
         description: data.description,
         amount: Number(data.amount),
-        type: data.type,
+        type: finalType,
         accountId: Number(data.accountId),
-        date: data.date ? new Date(data.date) : undefined
+        date: data.date ? new Date(data.date) : undefined,
+        creditCardId: data.creditCardId ? Number(data.creditCardId) : null
       }
     });
   }
 
   async deleteTransaction(id: number) {
-    return await prisma.transaction.delete({
+    const transaction = await prisma.transaction.findUnique({
       where: { id }
     });
+
+    if (!transaction) throw new Error("Transação não encontrada.");
+
+    const hasCreditCard = !!transaction.creditCardId;
+
+    const amountToReverse = hasCreditCard ? 0 : (transaction.type === 'INCOME' 
+          ? -Number(transaction.amount) 
+          : Number(transaction.amount));
+
+    const result = await prisma.$transaction([
+      prisma.transaction.delete({
+        where: { id }
+      }),
+      prisma.account.update({
+        where: { id: transaction.accountId! },
+        data: { balance: { increment: amountToReverse } }
+      })
+    ] as const); 
+
+    return result[0];
   }
 }

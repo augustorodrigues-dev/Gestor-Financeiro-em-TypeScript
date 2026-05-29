@@ -33,7 +33,6 @@ export default function AccountManager() {
   const loadAccounts = async () => {
     try {
       const data = await accountService.getUserAccounts();
-      // 🛡️ Blindagem para evitar tela branca caso a API não retorne um array
       setAccounts(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message);
@@ -53,12 +52,11 @@ export default function AccountManager() {
     e.preventDefault();
     setError('');
     try {
-      // 🚀 Removemos o userId daqui. O backend agora pega o ID direto do Token JWT!
       await accountService.createAccount({
         name,
         type,
         balance,
-        userId: 0 // Mantido como dummy, já que o backend vai ignorar e usar o do Token
+        userId: 0 
       });
 
       setName('');

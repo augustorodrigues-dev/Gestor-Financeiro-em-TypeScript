@@ -18,16 +18,11 @@ export class CreditCardService {
     const cards = await prisma.creditCard.findMany({
       where: { userId },
       include: {
-        // Traz as transações vinculadas a este cartão para calcularmos a fatura atual
-        transactions: {
-          where: { isCleared: false } // Apenas compras que ainda não foram pagas
-        }
+        transactions: true 
       }
     });
 
-    // Recalcula os limites conforme exigido no fluxo principal do UC08
     return cards.map(card => {
-      // Como limitAmount é Decimal, convertemos para número aqui
       const limiteTotal = Number(card.limitAmount);
       
       const currentInvoice = card.transactions.reduce((acc, tx) => acc + Number(tx.amount), 0);
@@ -51,7 +46,7 @@ export class CreditCardService {
       where: { id },
       data: {
         name: data.name,
-        limitAmount: data.limitAmount ? data.limitAmount : undefined, // 🚀 Ajustado para o seu schema
+        limitAmount: data.limitAmount ? data.limitAmount : undefined, 
         closingDay: data.closingDay ? Number(data.closingDay) : undefined,
         dueDay: data.dueDay ? Number(data.dueDay) : undefined,
       }
@@ -66,7 +61,6 @@ export class CreditCardService {
 
     if (!card) throw new Error("Cartão não encontrado.");
 
-    // Regra do UC08: Histórico é mantido. Se houver transações pendentes, bloqueia a exclusão física.
     if (card.transactions.length > 0) {
       throw new Error("Não é possível excluir um cartão com faturas pendentes ou histórico ativo.");
     }
