@@ -4,36 +4,45 @@
   "main": "src/server.ts",
   "scripts": {
     "dev": "ts-node-dev src/server.ts",
-    "test": "jest",
-    "test:coverage": "jest --coverage --coverageReporters=\"lcov\" --coverageDirectory=\"coverage\""
+    "build": "tsc",
+    "test": "jest --runInBand --forceExit",
+    "test:unit": "jest Service.test --verbose",
+    "test:integration": "jest integration --runInBand --forceExit --verbose",
+    "test:coverage": "jest --coverage --runInBand --forceExit",
+    "lint": "eslint \"src/**/*.ts\"",
+    "prisma:generate": "prisma generate",
+    "db:migrate": "prisma migrate deploy",
+    "db:seed": "prisma db seed"
   },
   "dependencies": {
-    "@prisma/adapter-pg": "^7.8.0",
+    "@prisma/adapter-better-sqlite3": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "@prisma/config": "^7.8.0",
     "axios": "^1.6.0",
     "bcrypt": "^6.0.0",
+    "better-sqlite3": "^12.10.0",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^4.18.2",
-    "jsonwebtoken": "^9.0.3",
-    "pg": "^8.21.0"
+    "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
+    "@eslint/js": "^9.18.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.17",
     "@types/express": "^4.17.21",
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20.19.41",
-    "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
+    "eslint": "^9.18.0",
     "jest": "^30.4.2",
+    "prisma": "^7.8.0",
     "supertest": "^7.2.2",
     "ts-jest": "^29.4.10",
+    "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",
-    "typescript": "^5.0.0"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seed.ts"
+    "typescript": "^5.0.0",
+    "typescript-eslint": "^8.20.0"
   }
 }

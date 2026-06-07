@@ -110,21 +110,21 @@ export default function Wallet({ userId }: WalletProps) {
         <div className="rounded-xl border border-neutral-200 bg-white p-5 shadow-card">
           <h3 className="mb-4 font-bold text-neutral-800">Nova Transação</h3>
           <form onSubmit={handleSaveTransaction} className="space-y-4">
-            <input required type="text" placeholder="Ex: Supermercado" value={txDesc} onChange={e => setTxDesc(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" />
+            <input data-cy="tx-desc" required type="text" placeholder="Ex: Supermercado" value={txDesc} onChange={e => setTxDesc(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" />
             
             <div className="flex gap-2">
-              <input required type="number" step="0.01" placeholder="R$ 0,00" value={txAmount} onChange={e => setTxAmount(e.target.value)} className="w-2/3 rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" />
+              <input data-cy="tx-amount" required type="number" step="0.01" placeholder="R$ 0,00" value={txAmount} onChange={e => setTxAmount(e.target.value)} className="w-2/3 rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" />
               <select value={txType} onChange={e => setTxType(e.target.value)} disabled={!!txCreditCardId} className={`w-1/3 rounded-lg border p-2.5 text-sm font-semibold outline-none ${txType === 'INCOME' ? 'text-success-600' : 'text-danger-600'} ${txCreditCardId ? 'bg-neutral-100 opacity-70' : 'bg-white'}`}>
                 <option value="EXPENSE">Despesa</option>
                 <option value="INCOME">Receita</option>
               </select>
             </div>
 
-            <select value={txAccountId} onChange={e => setTxAccountId(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500">
+            <select data-cy="tx-account" value={txAccountId} onChange={e => setTxAccountId(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500">
               {accounts.map(acc => <option key={acc.id} value={acc.id}>{acc.name} (Saldo base)</option>)}
             </select>
 
-            <select value={txCategoryId} onChange={e => setTxCategoryId(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" required>
+            <select data-cy="tx-category" value={txCategoryId} onChange={e => setTxCategoryId(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" required>
               <option value="">Selecione uma categoria...</option>
               {categories.map(cat => <option key={cat.id} value={cat.id}>{cat.name}</option>)}
             </select>
@@ -136,7 +136,7 @@ export default function Wallet({ userId }: WalletProps) {
 
             <input required type="date" value={txDate} onChange={e => setTxDate(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500" />
             
-            <button type="submit" className="w-full rounded-lg bg-brand-600 py-2.5 font-bold text-white transition-colors hover:bg-brand-700">Salvar Transação</button>
+            <button data-cy="tx-save" type="submit" className="w-full rounded-lg bg-brand-600 py-2.5 font-bold text-white transition-colors hover:bg-brand-700">Salvar Transação</button>
           </form>
         </div>
 
@@ -145,7 +145,7 @@ export default function Wallet({ userId }: WalletProps) {
           <form onSubmit={handleCreateAccount} className="space-y-4">
             <div>
               <label className="mb-1 block text-xs font-medium text-neutral-500">Instituição (Brasil API)</label>
-              <select required value={selectedBankName} onChange={e => setSelectedBankName(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500">
+              <select data-cy="acc-bank" required value={selectedBankName} onChange={e => setSelectedBankName(e.target.value)} className="w-full rounded-lg border p-2.5 text-sm outline-none focus:border-brand-500">
                 <option value="" disabled>Selecione o banco...</option>
                 <option value="Outro / Carteira Física">Outro (Carteira Física / Espécie)</option>
                 {officialBanks.map((bank, index) => (
@@ -161,7 +161,7 @@ export default function Wallet({ userId }: WalletProps) {
                 <option value="CARTEIRA">Carteira / Dinheiro Vivo</option>
               </select>
             </div>
-            <button type="submit" className="w-full rounded-lg bg-neutral-800 py-2.5 font-bold text-white transition-colors hover:bg-neutral-900">+ Adicionar Conta Oficial</button>
+            <button data-cy="acc-add" type="submit" className="w-full rounded-lg bg-neutral-800 py-2.5 font-bold text-white transition-colors hover:bg-neutral-900">+ Adicionar Conta Oficial</button>
           </form>
         </div>
       </div>

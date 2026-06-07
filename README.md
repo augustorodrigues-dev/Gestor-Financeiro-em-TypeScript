@@ -2,353 +2,209 @@
 
 ## Plataforma Web de Gestão Financeira Pessoal
 
-O **FinanceFlow** é uma aplicação web full stack desenvolvida para auxiliar usuários no controle da vida financeira de forma simples, moderna e segura.
+O **FinanceFlow** é uma aplicação web *full stack* (TypeScript de ponta a ponta) para
+controle financeiro pessoal: registro de receitas e despesas, saldo consolidado em
+tempo real, contas vinculadas a instituições financeiras reais (via **Brasil API**),
+cartões de crédito com cálculo de fatura/limite, categorias, metas financeiras e um
+painel administrativo com controle de acesso por papéis.
 
-O sistema permite registrar transações financeiras, visualizar saldo dinâmico atualizado, cadastrar contas vinculadas a instituições financeiras reais utilizando dados da [Brasil API](https://brasilapi.com.br) e gerenciar cartões de crédito de ponta a ponta.
+O banco de dados é **local em arquivo (SQLite)** — não exige Docker, servidor de banco
+nem conexão com a internet para funcionar.
 
-Com os recentes avanços, a plataforma agora conta com sistema de autenticação, níveis de acesso, um painel administrativo completo e uma arquitetura blindada por uma **Pirâmide de Testes Automatizados** (Unitários, Integração e E2E). O código também passou por refatorações de Clean Code, isolando constantes e melhorando a manutenibilidade.
-
-O projeto foi estruturado seguindo padrões modernos de desenvolvimento, utilizando um ecossistema TypeScript ponta a ponta, isolamento de banco de dados via Docker, testes automatizados e segurança com JSON Web Tokens (JWT).
-
----
-
-# ✨ Funcionalidades
-
-## 🔐 Autenticação e Autorização
-
-Sistema de login e cadastro com criptografia de senhas utilizando **Bcrypt** e controle de acesso baseado em papéis (**USER** e **ADMIN**).
+> 📚 **Documentação completa do projeto** (casos de uso, casos de teste, cobertura e
+> análise estática) na pasta **[`docs/`](./docs/README.md)**.
 
 ---
 
-## 👑 Painel Administrativo
+## 🚀 Início Rápido (Windows — scripts `.bat`)
 
-Área exclusiva para administradores realizarem a gestão completa (**CRUD**) dos usuários e definirem privilégios de acesso.
+Para a forma mais simples de rodar tudo, **dê dois cliques** (nesta ordem):
 
----
+| Script | O que faz |
+| ------ | --------- |
+| **`instalar.bat`** | Instala todas as dependências (raiz, backend, frontend), cria o `.env`, gera o Prisma Client, cria o banco SQLite local (`backend/dev.db`) e popula os dados de exemplo. |
+| **`rodar-site.bat`** | Inicia backend + frontend juntos e abre o navegador. |
+| **`rodar-testes.bat`** | Menu para rodar testes unitários, de integração, cobertura e E2E. |
 
-## 📊 Controle de Receitas e Despesas
-
-Registro completo de entradas e saídas financeiras (**CRUD de transações**) vinculadas a contas específicas.
-
----
-
-## 💳 Gestão de Cartões de Crédito
-
-Módulo completo para cadastro de cartões, acompanhamento de faturas e cálculo matemático automático de limite disponível em tempo real, incluindo travas de segurança contra exclusão indevida.
+> Pré-requisitos: **Node.js 20+** e **Git**. (Não precisa de Docker.)
 
 ---
 
-## 💰 Saldo Total Dinâmico
+## 🧰 Stack Tecnológica
 
-Atualização automática baseada no somatório das contas, transações e faturas salvas no banco de dados.
+| Camada | Tecnologias |
+| ------ | ----------- |
+| **Front-end** | React 18, Vite, TypeScript, Tailwind CSS |
+| **Back-end** | Node.js, Express, TypeScript, Prisma ORM 7, JWT, Bcrypt |
+| **Banco de dados** | **SQLite** (arquivo local) via Prisma + driver adapter `better-sqlite3` |
+| **Testes** | Jest + ts-jest + Supertest (back-end), Vitest + Testing Library (front-end), Cypress (E2E) |
+| **Qualidade** | ESLint + typescript-eslint, SonarQube/SonarCloud, `npm audit` |
 
----
-
-## 🏦 Cadastro de Contas Bancárias (Filtragem Inteligente)
-
-Integração com instituições financeiras reais listadas via [Brasil API](https://brasilapi.com.br). O sistema conta com um filtro modular otimizado que exibe apenas as principais instituições financeiras do país, garantindo uma interface limpa.
-
----
-
-## 🌱 Database Seeding Automático
-
-População de dados inicial (usuários padrão, administradores, contas e transações de teste) com um único comando para facilitar o ambiente de desenvolvimento.
+A justificativa detalhada da stack está em
+[`docs/01-VISAO-GERAL-E-JUSTIFICATIVA-TECNICA.md`](./docs/01-VISAO-GERAL-E-JUSTIFICATIVA-TECNICA.md).
 
 ---
 
-## 🐳 Ambiente Isolado com Docker
+## 📁 Estrutura do Projeto
 
-Inicialização rápida do PostgreSQL e pgAdmin4 sem necessidade de instalação nativa.
-
----
-
-## ⚡ Execução Unificada
-
-Front-end e back-end executados simultaneamente utilizando um único comando.
-
----
-
-# 🚀 Tecnologias Utilizadas
-
-## Front-end
-
-* React 18
-* Vite
-* TypeScript
-* Tailwind CSS
-
----
-
-## Back-end
-
-* Node.js
-* Express
-* TypeScript
-* Prisma ORM
-* bcrypt
-* JSON Web Token (JWT)
-
----
-
-## Banco de Dados & Infraestrutura
-
-* PostgreSQL 15
-* Docker & Docker Compose
-* pgAdmin4
-
----
-
-## Qualidade & Testes (Pirâmide Completa)
-
-* Jest & ts-jest (Testes Unitários e de Integração)
-* Supertest (Mock de Requisições HTTP)
-* Cypress (Testes End-to-End / E2E)
-
----
-
-# 📁 Estrutura do Projeto
-
-```plaintext id="s2vl0v"
-GESTOR-FINANCEIRO-EM-TYPESCRIPT/
+```text
+Gestor-Financeiro-em-TypeScript/
+│
+├── instalar.bat            # Instala tudo e prepara o banco local
+├── rodar-site.bat          # Sobe o site (backend + frontend)
+├── rodar-testes.bat        # Executa a suite de testes
+├── sonar-project.properties# Configuração do SonarQube/SonarCloud
+├── package.json            # Scripts orquestradores (concurrently)
+│
+├── docs/                   # Documentação técnica (casos de uso, testes, etc.)
 │
 ├── backend/
 │   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── seed.ts
+│   │   ├── schema.prisma   # Modelo de dados (provider: sqlite)
+│   │   └── migrations/     # Migrations versionadas (recriam o banco)
+│   │   └── (dev.db é criado em backend/dev.db pelas migrations — ignorado no Git)
 │   ├── src/
-│   │   ├── controllers/
-│   │   │   ├── CreditCardController.ts
-│   │   │   ├── TransactionController.ts
-│   │   │   └── userController.ts
-│   │   ├── routes/
-│   │   │   ├── creditCard.routes.ts
-│   │   │   ├── transaction.routes.ts
-│   │   │   └── userRoutes.ts
-│   │   ├── services/
-│   │   │   ├── brasilApiService.ts
-│   │   │   ├── CreditCardService.ts
-│   │   │   ├── TransactionService.ts
-│   │   │   └── UserService.ts
-│   │   └── server.ts
-│   └── tests/
-│       ├── CreditCardService.test.ts
-│       ├── creditCard.integration.test.ts
-│       └── transactions.integration.test.ts
+│   │   ├── controllers/    # Tratamento HTTP (I/O e exceções)
+│   │   ├── middlewares/    # authMiddleware (JWT)
+│   │   ├── routes/         # Endpoints REST
+│   │   ├── services/       # Regras de negócio + Prisma + brasilApiService
+│   │   ├── prisma.ts       # Prisma Client + adapter SQLite (better-sqlite3)
+│   │   ├── seed.ts         # Carga de dados de exemplo
+│   │   └── server.ts       # Bootstrap do Express
+│   ├── tests/              # Testes unitarios (*Service.test.ts) e de integracao (*.integration.test.ts)
+│   ├── eslint.config.mjs   # Análise estática (ESLint flat config)
+│   └── jest.config.ts      # Config de testes + threshold de cobertura (75%)
 │
-├── frontend/
-│   ├── cypress/
-│   │   └── e2e/
-│   │       ├── creditCard.cy.ts
-│   │       └── users.cy.ts
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── AdminPanel.tsx
-│   │   │   ├── Dashboard.tsx
-│   │   │   └── CreditCardManager.tsx
-│   │   ├── services/
-│   │   └── App.tsx
-│   └── cypress.config.ts
-│
-├── docker-compose.yml
-└── package.json
+└── frontend/
+    ├── src/
+    │   ├── pages/          # Login, Register, Dashboard, Wallet, AdminPanel
+    │   ├── components/     # AccountManager, CategoryManager, CreditCardManager, GoalManager
+    │   ├── services/       # Cliente HTTP da API
+    │   └── App.tsx
+    └── cypress/e2e/        # Testes End-to-End
 ```
 
 ---
 
-# ⚙️ Pré-requisitos
+## ⚙️ Instalação Manual (alternativa aos `.bat`)
 
-Antes de executar o projeto, certifique-se de possuir instalado:
+### 1. Clonar e instalar dependências
 
-* Node.js v20+
-* NPM
-* Docker e Docker Compose
-* Git
-
----
-
-# 🛠️ Configuração do Ambiente
-
-## 1️⃣ Clonar o Repositório
-
-```bash id="7w7jq4"
+```bash
 git clone https://github.com/augustorodrigues-dev/Gestor-Financeiro-em-TypeScript.git
-
 cd Gestor-Financeiro-em-TypeScript
+
+# Instala raiz + backend + frontend de uma vez
+npm run install:all
 ```
 
----
+### 2. Configurar variáveis de ambiente
 
-## 2️⃣ Instalar as Dependências
-
-```bash id="7omtrw"
-# Dependências da raiz, backend e frontend
-npm install
-
-cd backend && npm install
-
-cd ../frontend && npm install
-```
-
----
-
-## 3️⃣ Subir a Infraestrutura Docker
-
-Na raiz do projeto, execute:
-
-```bash id="ok7yjp"
-docker compose up -d
-```
-
----
-
-## 4️⃣ Configurar Variáveis de Ambiente
-
-Crie um arquivo `.env` dentro da pasta `backend/`:
-
-```env id="mwbjcd"
-DATABASE_URL="postgresql://admin:adminpassword@localhost:5433/financeflow_local"
-
-JWT_SECRET="chave_teste"
-```
-
----
-
-## 5️⃣ Executar Migrations e Preparar o Banco
-
-Dentro da pasta `backend/`:
-
-```bash id="i9oj3x"
-npx prisma generate
-
-npx prisma migrate dev --name init_local
-
-npx prisma db seed
-```
-
----
-
-# 💻 Como Executar a Aplicação
-
-O projeto utiliza o pacote `concurrently` para executar front-end e back-end simultaneamente.
-
-Na raiz do projeto, execute:
-
-```bash id="1i8bfb"
-npm run dev
-```
-
----
-
-# 🌐 Endereços da Aplicação
-
-| Serviço           | URL                   |
-| ----------------- | --------------------- |
-| Front-end (React) | http://localhost:5173 |
-| Back-end (API)    | http://localhost:3001 |
-| pgAdmin4          | http://localhost:5050 |
-
----
-
-# 🧪 Qualidade de Código & Testes
-
-A aplicação possui uma arquitetura robusta validada por uma pirâmide de testes completa, garantindo a integridade desde a regra de negócio até a interface gráfica do usuário final.
-
----
-
-## 🔬 Testes Unitários e de Integração (Backend)
-
-Cobrem lógicas matemáticas, travas de segurança, rotas HTTP e persistência real no banco de dados.
-
-Executados com Jest e Supertest.
-
-```bash id="h67v4m"
+```bash
 cd backend
+cp .env.example .env      # Windows (PowerShell): Copy-Item .env.example .env
+cd ..
+```
 
-npm test
+Conteúdo padrão do `backend/.env`:
+
+```env
+DATABASE_URL="file:./dev.db"
+JWT_SECRET="financeflow_super_secret_key_dev"
+PORT=3001
+```
+
+### 3. Preparar o banco de dados local (SQLite)
+
+```bash
+cd backend
+npm run prisma:generate           # Gera o Prisma Client
+npm run db:migrate                # Cria backend/dev.db e aplica as migrations
+npm run db:seed                   # Popula dados de exemplo
+cd ..
+```
+
+### 4. Executar a aplicação
+
+```bash
+npm run dev                       # Sobe backend + frontend simultaneamente
 ```
 
 ---
 
-## 🖥️ Testes End-to-End (E2E) - Frontend
+## 🌐 Endereços da Aplicação
 
-Simulam o comportamento real do usuário interagindo com a interface gráfica, garantindo que o fluxo completo (login, navegação, preenchimento de formulários e exclusão visual) funcione perfeitamente.
+| Serviço | URL |
+| ------- | --- |
+| Front-end (React) | http://localhost:5173 |
+| Back-end (API) | http://localhost:3001 |
 
-Executados com Cypress.
+### 🔑 Credenciais de Teste (após o seed)
 
-```bash id="qf2jcb"
+| Perfil | E-mail | Senha |
+| ------ | ------ | ----- |
+| Usuário | `jadao@gmail.com` | `1234` |
+| Usuário | `nando@gmail.com` | `1234` |
+| **Administrador** | `alexandra@gmail.com` | `1234` |
+
+> 💡 Para inspecionar o banco visualmente, abra `backend/dev.db` em qualquer
+> ferramenta SQLite (ex.: extensão *SQLite Viewer* do VS Code, *DB Browser for SQLite*)
+> ou rode `npx prisma studio` dentro de `backend/`.
+
+---
+
+## 🧪 Testes e Qualidade
+
+A aplicação é validada por uma **pirâmide de testes em 3 níveis**.
+**Resultado atual: 119 testes automatizados aprovados** (39 unitários de back-end +
+39 unitários de front-end + 41 de integração) **+ 5 fluxos E2E**, com **cobertura de
+back-end de ~89%** e **front-end de ~98% (linhas)**.
+
+```bash
+# Back-end (a partir de backend/ ou via raiz com npm --prefix)
+npm test                  # Unitários + integração
+npm run test:unit         # Apenas unitários (não tocam o banco)
+npm run test:integration  # Apenas integração (usam o SQLite local)
+npm run test:coverage     # Tudo + relatório de cobertura (backend/coverage/)
+npm run lint              # Análise estática (ESLint)
+
+# Front-end — testes unitários (Vitest + Testing Library)
 cd frontend
+npm test                  # Testes unitários do front-end
+npm run test:coverage     # Com cobertura (frontend/coverage/)
 
-npx cypress open
+# Front-end — E2E (com o site rodando em http://localhost:5173)
+npm run cypress:open      # Modo interativo
+npm run cypress:run       # Modo headless
 ```
 
----
+Detalhes da estratégia, do relatório de cobertura e da análise estática:
 
-## ✅ Principais Cenários Cobertos
-
-* ✔️ Gestão de Cartões: Cadastro de cartões de crédito na interface com validação de renderização.
-* ✔️ Segurança e Validação: Bloqueio de exclusão de cartões com faturas ativas.
-* ✔️ Integração Real: Injeção de Bearer Tokens reais nos testes de rotas protegidas.
-* ✔️ Teardown Automático: Limpeza do banco de dados ao fim da suíte utilizando requisições DELETE controladas.
+- [`docs/04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md`](./docs/04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md)
+- [`docs/05-RELATORIO-ANALISE-ESTATICA.md`](./docs/05-RELATORIO-ANALISE-ESTATICA.md)
 
 ---
 
-# 📊 Gerenciamento Visual com pgAdmin4
+## ✨ Principais Funcionalidades
 
-O pgAdmin4 está disponível para administração visual do banco de dados.
-
----
-
-## 🔑 Credenciais de Login
-
-```plaintext id="t20vl4"
-Email: admin@financeflow.com
-Senha: admin
-```
+- 🔐 **Autenticação e Autorização** — login/cadastro com Bcrypt e papéis (USER/ADMIN).
+- 👑 **Painel Administrativo** — CRUD de usuários e gestão de privilégios.
+- 📊 **Receitas e Despesas** — CRUD de transações com saldo recalculado automaticamente.
+- 💳 **Cartões de Crédito** — cálculo automático de fatura e limite disponível, com travas de exclusão.
+- 🏦 **Contas Bancárias** — vinculadas a instituições reais via **Brasil API**.
+- 🏷️ **Categorias** — padrão do sistema + personalizadas.
+- 🎯 **Metas Financeiras** — progresso percentual e aportes.
+- 💰 **Saldo Consolidado** — somatório dinâmico das contas.
 
 ---
 
-## ⚙️ Configuração do Servidor
+## 👨‍💻 Equipe
 
-| Campo                | Valor             |
-| -------------------- | ----------------- |
-| Host name/address    | db                |
-| Port                 | 5432              |
-| Maintenance database | financeflow_local |
-| Username             | admin             |
-| Password             | adminpassword     |
+Projeto desenvolvido para a disciplina de **Qualidade de Software** (CESUPA).
 
----
+- Augusto Rodrigues
+- Cauê Barroso
+- César Ribeiro
+- Fernando Fonseca
 
-# 📌 Diretrizes da Arquitetura
-
-O desenvolvimento foi estruturado seguindo o padrão de arquitetura em camadas (MVC adaptado) e princípios de Clean Code.
-
----
-
-## Routes
-
-Responsáveis pelo mapeamento dos endpoints HTTP e aplicação de middlewares de segurança.
-
----
-
-## Controllers
-
-Responsáveis pelo tratamento de exceções e envio das respostas HTTP.
-
----
-
-## Services
-
-Responsáveis pelas regras de negócio rigorosas e persistência de dados utilizando Prisma ORM.
-
----
-
-## Utils / Constants
-
-Isolamento de dados estáticos para manter os serviços enxutos e organizados.
-
----
-
-# 👨‍💻 Autor
-
-Desenvolvido por **Augusto Rodrigues** 🚀
+> Caso algum nome precise de ajuste, edite esta seção.

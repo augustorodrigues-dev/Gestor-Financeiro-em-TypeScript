@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
-    "lib": ["es5", "dom"],
-    "types": ["cypress", "node"]
+    "target": "ES2018",
+    "lib": ["ES2018", "DOM"],
+    "types": ["cypress"],
+    "skipLibCheck": true,
+    "noEmit": true
   },
   "include": ["**/*.ts"]
 }

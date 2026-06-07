@@ -1,48 +1,44 @@
-describe('Fluxo E2E: Criação de Transação', () => {
-  
-  beforeEach(() => {
-    cy.on('window:alert', (text) => {
-      const mensagensValidas = ['sucesso', 'vinculada', 'primeiro'];
-      const contemMensagemValida = mensagensValidas.some(msg => text.toLowerCase().includes(msg));
-      expect(contemMensagemValida).to.be.true;
-    });
-  });
+describe('Fluxo E2E: Jornada completa de Transação', () => {
+  // Observação: o Cypress aceita automaticamente window.alert/confirm por padrão.
 
-  it('Deve cadastrar usuário, criar conta bancária, registrar despesa e ver no dashboard', () => {
+  it('Cadastra usuário, cria categoria, vincula conta, registra despesa e confere no dashboard', () => {
     const uniqueId = Date.now();
     const testEmail = `user_${uniqueId}@financeflow.com`;
+    const nomeCategoria = `Eletrônicos ${uniqueId}`;
 
-    cy.visit('http://localhost:5173'); 
-
+    // 1) Cadastro (login automático após registrar) ------------------------
+    cy.visit('/');
     cy.contains('Não tem uma conta? Cadastre-se aqui').click();
-    cy.get('input[placeholder*="nome" i], input[type="text"]').type('Augusto E2E');
+    cy.get('input[type="text"]').first().type('Augusto E2E');
     cy.get('input[type="email"]').type(testEmail);
     cy.get('input[type="password"]').type('123456');
     cy.contains('button', 'Cadastrar').click();
 
-    cy.get('body').then(($body) => {
-      if ($body.text().includes('Entrar no FinanceFlow')) {
-        cy.get('input[type="email"]').clear().type(testEmail);
-        cy.get('input[type="password"]').clear().type('123456');
-        cy.contains('button', 'Entrar').click();
-      }
-    });
+    cy.contains('Bem-vindo', { timeout: 10000 }).should('be.visible');
 
-    cy.contains('Bem-vindo', { timeout: 6000 }).should('be.visible');
+    // 2) Cria uma categoria (pré-condição para lançar transação) -----------
+    cy.contains('button', '🏷️ Categorias').click();
+    cy.get('[data-cy=cat-name]').type(nomeCategoria);
+    cy.get('[data-cy=cat-create]').click();
+    cy.contains(nomeCategoria).should('be.visible');
 
-    cy.contains('💼 Carteira').click();
+    // 3) Vincula uma conta financeira --------------------------------------
+    cy.contains('button', '💼 Carteira').click();
+    cy.get('[data-cy=acc-bank]').select('Outro / Carteira Física');
+    cy.get('[data-cy=acc-add]').click();
 
-    cy.contains('Vincular Conta Financeira').should('be.visible');
-    cy.get('select').eq(3).select('Outro / Carteira Física'); 
-    cy.contains('button', 'Adicionar Conta Oficial').click();
+    // Aguarda a conta recém-criada aparecer no seletor de transações.
+    cy.get('[data-cy=tx-account] option', { timeout: 10000 }).should('have.length.greaterThan', 0);
 
-    cy.get('input[placeholder="Ex: Supermercado"]').type('Teclado Mecânico');
-    cy.get('input[placeholder="R$ 0,00"]').type('350.00');
-    cy.get('select').eq(0).select('EXPENSE'); 
-    cy.contains('Salvar Transação').click();
+    // 4) Registra uma despesa ----------------------------------------------
+    cy.get('[data-cy=tx-desc]').type('Teclado Mecânico');
+    cy.get('[data-cy=tx-amount]').type('350');
+    cy.get('[data-cy=tx-category]').select(nomeCategoria);
+    cy.get('[data-cy=tx-save]').click();
 
-    cy.contains('📊 Dashboard').click();
-    cy.contains('Teclado Mecânico').should('be.visible');
+    // 5) Confere no dashboard ----------------------------------------------
+    cy.contains('button', '📊 Dashboard').click();
+    cy.contains('Teclado Mecânico', { timeout: 10000 }).should('be.visible');
     cy.contains('350.00').should('be.visible');
   });
 });

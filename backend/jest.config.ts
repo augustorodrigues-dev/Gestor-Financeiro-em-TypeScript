@@ -5,18 +5,21 @@ module.exports = {
   
   // Define onde buscar os testes
   testMatch: ['**/tests/**/*.test.ts'],
-  
+
   // Configurações de Cobertura (Coverage)
-  collectCoverage: true,
+  // A coleta de cobertura só é ativada pela flag --coverage (script test:coverage),
+  // permitindo rodar `test:unit` (sem banco) sem ser barrado pelo threshold global.
+  collectCoverage: false,
   coverageDirectory: 'coverage',
   coverageReporters: ['lcov', 'text', 'text-summary'], // lcov é obrigatório para o SonarQube
-  
+
   // Define quais arquivos devem ser avaliados para a nota de cobertura
   collectCoverageFrom: [
     'src/**/*.{ts,tsx}',
     '!src/**/*.d.ts',
     '!src/index.ts',            // Geralmente excluímos o entry point
     '!src/prisma.ts',           // Exclui a instância do Prisma
+    '!src/seed.ts',             // Script de seed (uso em desenvolvimento)
     '!src/routes/*.routes.ts',  // Exclui rotas (apenas redirecionam)
     '!**/node_modules/**'
   ],

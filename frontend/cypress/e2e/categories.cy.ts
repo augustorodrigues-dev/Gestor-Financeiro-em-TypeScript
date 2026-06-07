@@ -16,7 +16,7 @@ describe('Fluxo E2E: Gestão de Categorias', () => {
     cy.contains(nomeCat).should('be.visible');
 
     cy.contains(nomeCat)
-      .parent()
+      .closest('.border')
       .find('button')
       .contains('🗑️')
       .click();

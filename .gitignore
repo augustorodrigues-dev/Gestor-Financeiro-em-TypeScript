@@ -29,3 +29,9 @@ coverage/
 cypress/screenshots/
 cypress/videos/
 cypress/downloads/
+
+# Banco de dados local SQLite (gerado pelas migrations/seed)
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3

@@ -5,6 +5,8 @@ import { prisma } from '../src/prisma';
 describe('Integração: CRUD de Transações', () => {
   let transacaoCriadaId: number;
   let tokenAuth: string;
+  let contaUsadaId: number;
+  let categoriaUsadaId: number | undefined;
 
   beforeAll(async () => {
     const loginResponse = await request(app)
@@ -40,17 +42,17 @@ describe('Integração: CRUD de Transações', () => {
       request(app).get('/api/categories').set('Authorization', `Bearer ${tokenAuth}`)
     ]);
 
-    const accountId = contasRes.body[0]?.id;
-    const categoryId = catRes.body[0]?.id;
+    contaUsadaId = contasRes.body[0]?.id;
+    categoriaUsadaId = catRes.body[0]?.id;
 
-    expect(accountId).toBeDefined(); 
+    expect(contaUsadaId).toBeDefined();
 
     const novaTransacao = {
       description: 'Teste Automatizado - Supermercado',
-      amount: 150.50,
+      amount: 150.5,
       type: 'EXPENSE',
-      accountId: accountId, 
-      categoryId: categoryId,
+      accountId: contaUsadaId,
+      categoryId: categoriaUsadaId,
       date: '2026-05-20'
     };
 
@@ -92,10 +94,10 @@ describe('Integração: CRUD de Transações', () => {
 
     const dadosAtualizados = {
       description: 'Teste Automatizado - Supermercado',
-      amount: 240.00,
+      amount: 240,
       type: 'EXPENSE',
-      accountId: 9,
-      categoryId: 1,
+      accountId: contaUsadaId,
+      categoryId: categoriaUsadaId,
       date: '2026-05-20'
     };
 
@@ -106,7 +108,7 @@ describe('Integração: CRUD de Transações', () => {
 
     expect(response.status).toBe(200);
     const transacaoRetornada = response.body.transaction || response.body;
-    expect(Number(transacaoRetornada.amount)).toBe(240.00);
+    expect(Number(transacaoRetornada.amount)).toBe(240);
   });
 
   it('5. Deve apagar a transação recém-criada', async () => {

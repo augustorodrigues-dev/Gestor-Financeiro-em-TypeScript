@@ -40,7 +40,7 @@ export function CategoryManager() {
       <form onSubmit={handleCreate} className="bg-white p-6 rounded-lg shadow-md mb-8 flex flex-wrap gap-4 items-end">
         <div>
           <label className="block text-sm font-medium">Nome</label>
-          <input className="border p-2 rounded" value={name} onChange={e => setName(e.target.value)} required />
+          <input data-cy="cat-name" className="border p-2 rounded" value={name} onChange={e => setName(e.target.value)} required />
         </div>
         <div>
           <label className="block text-sm font-medium">Tipo</label>
@@ -53,7 +53,7 @@ export function CategoryManager() {
           <label className="block text-sm font-medium">Cor</label>
           <input type="color" className="p-1 h-10 w-16" value={color} onChange={e => setColor(e.target.value)} />
         </div>
-        <button className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Criar</button>
+        <button data-cy="cat-create" className="bg-blue-600 text-white px-6 py-2 rounded font-bold">Criar</button>
       </form>
 
       {/* Grid de Categorias */}

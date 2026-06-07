@@ -1,41 +1,23 @@
-describe('Fluxo E2E: Gestão de Usuários e Acessos (Admin)', () => {
+describe('Fluxo E2E: Administração de Usuários e Acessos', () => {
+  // Observação: o Cypress aceita automaticamente window.alert/confirm por padrão.
 
-  beforeEach(() => {
-    cy.on('window:alert', (text) => {
-      const mensagensValidas = ['sucesso', 'atualizado', 'deletado'];
-      const contemMensagemValida = mensagensValidas.some(msg => text.toLowerCase().includes(msg));
-      expect(contemMensagemValida).to.be.true;
-    });
-  });
+  it('Loga como admin, lista os usuários e altera o nível de acesso de um usuário', () => {
+    cy.visit('/');
 
-  it('Deve logar como Admin, listar os usuários e simular a edição de permissões', () => {
-    cy.visit('http://localhost:5173');
+    // Acesso rápido como administradora (Alexandra) já semeada no banco.
+    cy.contains('button', 'Entrar como Admin').click();
 
-    cy.get('input[type="email"]').type('alexandra@gmail.com');
-    cy.get('input[type="password"]').type('senha'); 
-    cy.contains('button', 'Entrar').click();
+    cy.contains('Painel de Administração', { timeout: 10000 }).should('be.visible');
+    cy.contains('Controle de Usuários').should('be.visible');
 
-    cy.contains(/Admin|Alexandra/i, { timeout: 6000 }).should('be.visible');
-    
-    cy.get('body').then(($body) => {
-      if ($body.text().includes('Painel')) {
-        cy.contains(/Painel/i).click();
-      } else {
-        cy.contains(/Admin/i).click();
-      }
-    });
+    // Abre a edição inline do primeiro usuário da lista (botão ✏️).
+    cy.get('button[aria-label^="Editar"]').first().click();
 
-    cy.get('body').contains(/Usuário|Acesso|E-mail|Role/i).should('be.visible');
+    // Altera o nível de acesso e salva.
+    cy.get('select[aria-label="Nível de acesso"]').select('ADMIN');
+    cy.contains('button', 'Salvar').click();
 
-    cy.get('body').then(($body) => {
-      if ($body.find('button:contains("Editar")').length > 0) {
-        cy.contains('button', 'Editar').first().click();
-        
-        cy.get('select').select('ADMIN');
-        cy.contains('button', 'Salvar').click();
-      } else {
-        cy.log('Nenhum botão clássico de "Editar" encontrado na tabela.');
-      }
-    });
+    // Após salvar, o formulário inline fecha (a lista é recarregada).
+    cy.get('select[aria-label="Nível de acesso"]').should('not.exist');
   });
 });

@@ -2,25 +2,16 @@ import { prisma } from './prisma';
 import bcrypt from 'bcrypt';
 
 async function main() {
-  console.log('🧹 Limpando o banco de dados e reiniciando os contadores de ID...');
-  
-  try {
-    await prisma.$executeRawUnsafe('TRUNCATE TABLE "Transaction" RESTART IDENTITY CASCADE;');
-    await prisma.$executeRawUnsafe('TRUNCATE TABLE "Account" RESTART IDENTITY CASCADE;');
-    await prisma.$executeRawUnsafe('TRUNCATE TABLE "User" RESTART IDENTITY CASCADE;');
-  } catch (error) {
-    console.log('Tentando limpeza alternativa com letras minúsculas...');
-    try {
-      await prisma.$executeRawUnsafe('TRUNCATE TABLE "transaction" RESTART IDENTITY CASCADE;');
-      await prisma.$executeRawUnsafe('TRUNCATE TABLE "account" RESTART IDENTITY CASCADE;');
-      await prisma.$executeRawUnsafe('TRUNCATE TABLE "user" RESTART IDENTITY CASCADE;');
-    } catch (fallbackError) {
-      await prisma.transaction.deleteMany();
-      await prisma.account.deleteMany();
-      await prisma.user.deleteMany();
-      console.log('Aviso: Dados apagados via deleteMany, os IDs podem não ter iniciado em 1.');
-    }
-  }
+  console.log('🧹 Limpando o banco de dados (SQLite local)...');
+
+  // Remoção em ordem segura (respeitando as chaves estrangeiras).
+  await prisma.transaction.deleteMany();
+  await prisma.budget.deleteMany();
+  await prisma.goal.deleteMany();
+  await prisma.creditCard.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.user.deleteMany();
 
   const passwordHash = await bcrypt.hash('1234', 10);
 

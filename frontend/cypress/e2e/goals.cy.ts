@@ -1,10 +1,7 @@
-describe('Fluxo E2E: Gestão de Metas Financeiras (UC09)', () => {
+describe('Fluxo E2E: Gestão de Metas Financeiras (UC16 / UC17)', () => {
   const nomeMetaUnico = `Computador Novo - ${Date.now()}`;
 
   beforeEach(() => {
-    cy.on('window:alert', () => true);
-    cy.on('window:confirm', () => true);
-
     cy.visit('http://localhost:5173');
     cy.get('input[type="email"]').type('jadao@gmail.com'); 
     cy.get('input[type="password"]').type('1234'); 
