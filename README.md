@@ -178,6 +178,13 @@ npm run cypress:open      # Modo interativo
 npm run cypress:run       # Modo headless
 ```
 
+**Análise estática de qualidade** (a partir da raiz):
+
+```bash
+npm run quality              # ESLint (code smells/complexidade) + jscpd (duplicação)
+npm run quality:duplication  # Apenas o relatório de duplicação (jscpd)
+```
+
 Detalhes da estratégia, do relatório de cobertura e da análise estática:
 
 - [`docs/04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md`](./docs/04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md)

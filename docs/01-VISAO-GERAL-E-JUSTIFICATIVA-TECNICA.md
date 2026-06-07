@@ -115,6 +115,81 @@ Budget      (1) ───< (N) Transaction   (onDelete: SetNull)
 Category    (1) ───< (N) Budget
 ```
 
+### Diagrama Entidade-Relacionamento (Mermaid)
+
+```mermaid
+erDiagram
+    usuario ||--o{ conta : possui
+    usuario ||--o{ categoria : possui
+    usuario ||--o{ cartaocredito : possui
+    usuario ||--o{ objetivo : possui
+    usuario ||--o{ orcamento : possui
+    conta ||--o{ transacao : registra
+    categoria ||--o{ transacao : classifica
+    cartaocredito ||--o{ transacao : compoe_fatura
+    orcamento ||--o{ transacao : agrupa
+    categoria ||--o{ orcamento : limita
+
+    usuario {
+        int user_id PK
+        string name
+        string email UK
+        string password_hash
+        string role "USER | ADMIN"
+        datetime created_at
+    }
+    conta {
+        int account_id PK
+        string name
+        string type
+        decimal balance
+        string currency
+        int user_id FK
+    }
+    categoria {
+        int category_id PK
+        string name
+        string type
+        boolean is_default
+        int user_id FK
+    }
+    cartaocredito {
+        int creditcard_id PK
+        string name
+        decimal limit_amount
+        int closing_day
+        int due_day
+        int user_id FK
+    }
+    objetivo {
+        int goal_id PK
+        string name
+        decimal target_amount
+        decimal current_amount
+        datetime deadline
+        int user_id FK
+    }
+    orcamento {
+        int budget_id PK
+        decimal amount_limit
+        int month
+        int year
+        int user_id FK
+        int category_id FK
+    }
+    transacao {
+        int transaction_id PK
+        decimal amount
+        datetime date
+        string description
+        string type "INCOME | EXPENSE"
+        int account_id FK
+        int category_id FK
+        int creditcard_id FK
+        int budget_id FK
+    }
+```
+
 **Regras de integridade relevantes:**
 
 - A exclusão de um `User` remove em cascata (`onDelete: Cascade`) suas contas,

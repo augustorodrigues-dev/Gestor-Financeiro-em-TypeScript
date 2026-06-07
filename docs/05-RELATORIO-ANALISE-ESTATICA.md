@@ -6,21 +6,35 @@
 > estática (SonarQube, Codacy, CodeClimate ou equivalentes), contemplando métricas de
 > complexidade, duplicação, code smells e vulnerabilidades.”*
 
-A qualidade é avaliada por **três ferramentas complementares**:
+A qualidade é avaliada por **ferramentas complementares**, todas **locais e
+reproduzíveis** (e exportáveis para o SonarQube quando desejado):
 
 | Ferramenta | Foco | Execução |
 | ---------- | ---- | -------- |
-| **SonarQube / SonarCloud** | Complexidade, duplicação, *code smells*, *bugs*, *security hotspots*, cobertura. | `sonar-scanner` (servidor). |
-| **ESLint + typescript-eslint** | *Code smells*, complexidade ciclomática, más práticas — análise **local** e reproduzível. | `npm run lint`. |
-| **npm audit** | Vulnerabilidades conhecidas em dependências. | `npm audit`. |
+| **ESLint + typescript-eslint** | *Code smells*, complexidade ciclomática, más práticas. | `npm run lint` |
+| **jscpd** | Duplicação de código (*copy/paste detection*). | `npm run quality:duplication` |
+| **npm audit** | Vulnerabilidades conhecidas em dependências. | `npm audit` |
+| **SonarQube / SonarCloud** | Consolida todas as métricas + cobertura em um *dashboard*. | `sonar-scanner` (servidor) |
+
+> Atalho: `npm run quality` executa ESLint + jscpd de uma vez.
+
+### 📊 Resultado consolidado (execução real)
+
+| Métrica de qualidade | Ferramenta | Resultado | Avaliação |
+| -------------------- | ---------- | --------- | --------- |
+| **Code smells** | ESLint | **0 problemas** (0 erros, 0 avisos) | ✅ Ótimo |
+| **Complexidade** | ESLint (`complexity` ≤ 12) | **0 violações** | ✅ Ótimo |
+| **Duplicação** | jscpd | **2,88%** de linhas duplicadas (limite: 5%) | ✅ Ótimo |
+| **Vulnerabilidades** | npm audit | **0** no front-end; **4 moderadas** no back-end (apenas devDeps) | ✅ Bom |
+| **Cobertura de testes** | Jest + Vitest (LCOV) | **~89% back-end** / **~98% linhas front-end** | ✅ Acima da meta |
 
 ---
 
 ## 1. SonarQube / SonarCloud
 
 A configuração está em [`sonar-project.properties`](../sonar-project.properties) (raiz),
-já apontando fontes (`backend/src`, `frontend/src`), testes e o relatório de cobertura
-(`backend/coverage/lcov.info`).
+já apontando fontes (`backend/src`, `frontend/src`), testes e os relatórios de cobertura
+(`backend/coverage/lcov.info` e `frontend/coverage/lcov.info`).
 
 ### Como executar (SonarQube local via Docker)
 
@@ -47,9 +61,9 @@ sonar-scanner -Dsonar.host.url=http://localhost:9000 -Dsonar.login=SEU_TOKEN
 
 - **Complexidade** (ciclomática e cognitiva) — limitada por design: a lógica vive em
   *Services* pequenos e coesos.
-- **Duplicação** — minimizada pela arquitetura em camadas (controllers finos, regras
-  centralizadas nos services) e isolamento de constantes (`frontend/src/utils/bancos.ts`).
-- **Code smells** — endereçados também pelo ESLint (ver abaixo).
+- **Duplicação** — medida em **2,88%** pelo jscpd (seção 4), minimizada pela arquitetura
+  em camadas (controllers finos, regras centralizadas nos services).
+- **Code smells** — **0** no ESLint (seção 2).
 - **Vulnerabilidades / Security Hotspots** — senhas com *hash* (Bcrypt), autenticação
   JWT em todas as rotas de dados, e `npm audit` (seção 3).
 - **Cobertura** — importada do LCOV: **~89% (back-end)** e **~98% linhas (front-end)**
@@ -92,7 +106,29 @@ cd backend && npm audit fix    # correções não disruptivas
 > Optou-se por **não** aplicar `npm audit fix --force` para preservar a
 > compatibilidade de versões já validada com a suíte de testes.
 
-## 4. Práticas de Qualidade no Código
+## 4. Duplicação de Código (jscpd)
+
+A duplicação é medida pelo **jscpd** (detecção de *copy/paste*), configurado em
+[`.jscpd.json`](../.jscpd.json) com limite de **5%** (o *build* falha acima disso).
+
+### Resultado obtido (execução real — `npm run quality:duplication`)
+
+```
+┌────────────┬────────────────┬─────────────┬──────────────┬──────────────────┐
+│ Format     │ Files analyzed │ Total lines │ Clones found │ Duplicated lines │
+├────────────┼────────────────┼─────────────┼──────────────┼──────────────────┤
+│ typescript │ 30             │ 1516        │ 7            │ 63 (4.16%)       │
+│ tsx        │ 11             │ 1456        │ 3            │ 39 (2.68%)       │
+│ Total:     │ 51             │ 3536        │ 10           │ 102 (2.88%)      │
+└────────────┴────────────────┴─────────────┴──────────────┴──────────────────┘
+```
+
+- **2,88%** de linhas duplicadas no código de produção — bem abaixo do limite de 5%.
+- Os 10 *clones* concentram-se nos blocos `try/catch` boilerplate dos *controllers*
+  (tratamento de erro HTTP padronizado) — duplicação aceitável e de baixo risco.
+- Gera também um relatório HTML navegável em `report/jscpd/` (ignorado no Git).
+
+## 5. Práticas de Qualidade no Código
 
 - **Arquitetura em camadas** (Routes → Controllers → Services) → baixa complexidade por unidade.
 - **Type-safety de ponta a ponta** com TypeScript + Prisma (erros capturados em tempo de compilação).

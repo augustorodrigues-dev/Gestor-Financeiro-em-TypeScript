@@ -35,3 +35,6 @@ cypress/downloads/
 *.db-journal
 *.sqlite
 *.sqlite3
+
+# Relatórios gerados (análise de duplicação jscpd)
+report/

@@ -1,0 +1,19 @@
+{
+  "threshold": 5,
+  "min-lines": 5,
+  "min-tokens": 50,
+  "reporters": ["console", "html"],
+  "output": "report/jscpd",
+  "format": ["typescript", "tsx", "javascript"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/coverage/**",
+    "**/tests/**",
+    "**/__tests__/**",
+    "**/cypress/**",
+    "**/*.config.*",
+    "**/*.test.*"
+  ],
+  "absolute": false
+}

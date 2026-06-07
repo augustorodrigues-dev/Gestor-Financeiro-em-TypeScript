@@ -16,9 +16,12 @@
     "test:front": "npm --prefix frontend test",
     "test:front:coverage": "npm --prefix frontend run test:coverage",
     "test:e2e": "npm --prefix frontend run cypress:run",
-    "lint": "npm --prefix backend run lint"
+    "lint": "npm --prefix backend run lint",
+    "quality:duplication": "jscpd backend/src frontend/src",
+    "quality": "npm run lint && npm run quality:duplication"
   },
   "devDependencies": {
-    "concurrently": "^9.1.0"
+    "concurrently": "^9.1.0",
+    "jscpd": "^4.0.5"
   }
 }
