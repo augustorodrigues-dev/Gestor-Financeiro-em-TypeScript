@@ -54,8 +54,8 @@ echo ------------------------------------------------------------
 echo  ANALISE DE QUALIDADE (analise estatica)
 echo ------------------------------------------------------------
 echo.
-echo [1/3] ESLint - code smells e complexidade...
-call npm --prefix backend run lint
+echo [1/3] ESLint - code smells e complexidade (back-end + front-end)...
+call npm run lint
 if errorlevel 1 (
   echo    ^>^> ESLint: PROBLEMAS ENCONTRADOS (veja acima)
 ) else (

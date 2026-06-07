@@ -11,7 +11,7 @@ reproduzíveis** (e exportáveis para o SonarQube quando desejado):
 
 | Ferramenta | Foco | Execução |
 | ---------- | ---- | -------- |
-| **ESLint + typescript-eslint** | *Code smells*, complexidade ciclomática, más práticas. | `npm run lint` |
+| **ESLint + typescript-eslint** | *Code smells*, complexidade ciclomática, regras de Hooks (React), más práticas — **back-end E front-end**. | `npm run lint` |
 | **jscpd** | Duplicação de código (*copy/paste detection*). | `npm run quality:duplication` |
 | **npm audit** | Vulnerabilidades conhecidas em dependências. | `npm audit` |
 | **SonarQube / SonarCloud** | Consolida todas as métricas + cobertura em um *dashboard*. | `sonar-scanner` (servidor) |
@@ -69,25 +69,27 @@ sonar-scanner -Dsonar.host.url=http://localhost:9000 -Dsonar.login=SEU_TOKEN
 - **Cobertura** — importada do LCOV: **~89% (back-end)** e **~98% linhas (front-end)**
   (ver [04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md](./04-ESTRATEGIA-E-RELATORIO-DE-TESTES.md)).
 
-## 2. ESLint (análise estática local)
+## 2. ESLint (análise estática local — back-end **e** front-end)
 
-Configuração *flat config* moderna em
-[`backend/eslint.config.mjs`](../backend/eslint.config.mjs), com `typescript-eslint`
-(*recommended*) e regras adicionais de *code smell*:
+Há **duas** configurações *flat config* com `typescript-eslint` (*recommended*):
 
-- `complexity` (máx. 12) — barra funções excessivamente complexas;
-- `max-lines-per-function` (máx. 80) — evita funções longas;
-- `no-duplicate-imports`, `eqeqeq`, `no-unused-vars` — boas práticas gerais.
+- [`backend/eslint.config.mjs`](../backend/eslint.config.mjs) — regras de *code smell*:
+  `complexity` (máx. 12), `max-lines-per-function` (máx. 80), `no-duplicate-imports`,
+  `eqeqeq`, `no-unused-vars`.
+- [`frontend/eslint.config.mjs`](../frontend/eslint.config.mjs) — mesmas regras +
+  **`react-hooks`** (regras dos Hooks e dependências de efeitos) e `react-refresh`.
 
 ### Resultado obtido (execução real — `npm run lint`)
 
 ```
-✔ 0 problems (0 errors, 0 warnings)
+Back-end : ✔ 0 problems (0 errors, 0 warnings)
+Front-end: ✔ 0 problems (0 errors, 0 warnings)
 ```
 
-> O código-fonte do backend está **livre de erros e avisos** do ESLint. Ajustes
-> realizados durante a auditoria de qualidade: padronização de *catch* sem variável
-> não utilizada e configuração explícita da augmentação de tipos do Express.
+> **Todo o código-fonte (back + front) está livre de erros e avisos** do ESLint.
+> Ajustes feitos na auditoria: *catch* sem variável não utilizada e augmentação de
+> tipos do Express (back), e correção das dependências de `useEffect` via `useCallback`
+> + remoção de prop não utilizada (front).
 
 ## 3. Vulnerabilidades de Dependências (`npm audit`)
 

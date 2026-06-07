@@ -78,7 +78,7 @@ export default function App() {
           userSession.role === 'ADMIN' ? (
             <AdminPanel />
           ) : (
-            currentView === 'dashboard' ? <Dashboard userId={userSession.id} userNameSession={userSession.name} /> :
+            currentView === 'dashboard' ? <Dashboard userNameSession={userSession.name} /> :
             currentView === 'wallet' ? <Wallet userId={userSession.id} /> :
             currentView === 'goals' ? <GoalManager /> :
             <CategoryManager />

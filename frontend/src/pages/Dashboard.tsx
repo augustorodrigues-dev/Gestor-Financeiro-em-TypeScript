@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, deleteTransaction } from '../services/transactionService';
 import { goalService } from '../services/goalService';
 import { categoryService } from '../services/categoryService'; // 🚀 Importado
 
 interface DashboardProps {
-  userId: number;
   userNameSession: string;
 }
 
-export default function Dashboard({ userId, userNameSession }: DashboardProps) {
+export default function Dashboard({ userNameSession }: DashboardProps) {
   const [userName, setUserName] = useState<string>('');
   const [balance, setBalance] = useState<number>(0);
   const [accounts, setAccounts] = useState<any[]>([]);
@@ -18,7 +17,7 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
   const [categories, setCategories] = useState<any[]>([]); // 🚀 Estado para categorias
   const [loadingData, setLoadingData] = useState(true);
 
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       setLoadingData(true);
       
@@ -47,9 +46,9 @@ export default function Dashboard({ userId, userNameSession }: DashboardProps) {
     } finally {
       setLoadingData(false);
     }
-  };
+  }, [userNameSession]);
 
-  useEffect(() => { loadDashboardData(); }, [userId, userNameSession]);
+  useEffect(() => { loadDashboardData(); }, [loadDashboardData]);
 
   const handleDeleteTransaction = async (id: number) => {
     if (!window.confirm("Deseja apagar esta transação? O saldo será recalculado.")) return;

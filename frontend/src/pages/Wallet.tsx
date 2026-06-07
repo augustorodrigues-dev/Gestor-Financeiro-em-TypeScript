@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { accountService } from '../services/accountService';
 import { createTransaction } from '../services/transactionService';
 import { creditCardService } from '../services/creditCardService';
@@ -33,7 +33,7 @@ export default function Wallet({ userId }: WalletProps) {
   const [selectedBankName, setSelectedBankName] = useState('');
   const [accountType, setAccountType] = useState('CORRENTE');
 
-  const loadWalletData = async () => {
+  const loadWalletData = useCallback(async () => {
     try {
       const [contas, bancosFiltro, cartoes, listaCategorias] = await Promise.all([
         accountService.getUserAccounts(),
@@ -48,15 +48,15 @@ export default function Wallet({ userId }: WalletProps) {
       setCreditCards(Array.isArray(cartoes) ? cartoes : []);
       setCategories(Array.isArray(listaCategorias) ? listaCategorias : []);
 
-      if (listaContas.length > 0 && !txAccountId) {
-        setTxAccountId(listaContas[0].id.toString());
+      if (listaContas.length > 0) {
+        setTxAccountId(prev => prev || listaContas[0].id.toString());
       }
     } catch (error) {
       console.error("Erro ao carregar dados da carteira:", error);
     }
-  };
+  }, []);
 
-  useEffect(() => { loadWalletData(); }, [userId]);
+  useEffect(() => { loadWalletData(); }, [loadWalletData]);
 
   const handleSaveTransaction = async (e: React.FormEvent) => {
     e.preventDefault();
