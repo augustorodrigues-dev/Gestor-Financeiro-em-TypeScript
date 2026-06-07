@@ -25,7 +25,7 @@ reproduzíveis** (e exportáveis para o SonarQube quando desejado):
 | **Code smells** | ESLint | **0 problemas** (0 erros, 0 avisos) | ✅ Ótimo |
 | **Complexidade** | ESLint (`complexity` ≤ 12) | **0 violações** | ✅ Ótimo |
 | **Duplicação** | jscpd | **2,88%** de linhas duplicadas (limite: 5%) | ✅ Ótimo |
-| **Vulnerabilidades** | npm audit | **0** no front-end; **4 moderadas** no back-end (apenas devDeps) | ✅ Bom |
+| **Vulnerabilidades** | npm audit | **0** no front-end; **3 moderadas** no back-end (só na CLI do Prisma, *devDep*) | ✅ Bom |
 | **Cobertura de testes** | Jest + Vitest (LCOV) | **~89% back-end** / **~98% linhas front-end** | ✅ Acima da meta |
 
 ---
@@ -94,17 +94,23 @@ Configuração *flat config* moderna em
 | Projeto | Vulnerabilidades | Severidade | Observação |
 | ------- | ---------------- | ---------- | ---------- |
 | **Frontend** | **0** | — | Limpo. |
-| **Backend** | 4 | Moderada | Em dependências **de desenvolvimento** (toolchain de *build/watch*), sem impacto em produção. |
+| **Backend** | **3** | Moderada | Exclusivamente na **CLI do Prisma** (`prisma`, *devDependency*) — fora do artefato em execução. |
 
-As ocorrências do backend são transitivas do ferramental de desenvolvimento e **não**
-afetam o artefato em execução. Remediação opcional:
+Foi aplicado `npm audit fix` (correção não disruptiva), que resolveu a única ocorrência
+de **produção** (`qs`, transitiva do Express: `6.15.1 → 6.15.2`). Após a suíte completa
+de testes confirmar que nada quebrou (80/80 aprovados), o número caiu de 4 para 3.
 
-```bash
-cd backend && npm audit fix    # correções não disruptivas
+As **3 ocorrências remanescentes** têm origem única e rastreável:
+
+```
+prisma@7.8.0  →  @prisma/dev  →  @hono/node-server (<1.19.13)
 ```
 
-> Optou-se por **não** aplicar `npm audit fix --force` para preservar a
-> compatibilidade de versões já validada com a suíte de testes.
+Ou seja, vêm da **ferramenta de linha de comando do Prisma** (usada para `migrate`/
+`generate`/`seed`), que é **devDependency** e **não** integra o servidor em execução.
+A correção automática exigiria `npm audit fix --force`, que faria *downgrade* do Prisma
+para a 6.x (*breaking change*) — por isso foi **deliberadamente evitada** para preservar
+a compatibilidade já validada pela suíte de testes.
 
 ## 4. Duplicação de Código (jscpd)
 
