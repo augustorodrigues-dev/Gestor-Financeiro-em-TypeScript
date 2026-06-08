@@ -1,7 +1,7 @@
-import { UserService } from '../src/services/UserService';
-import { prisma } from '../src/prisma';
+import { UserService } from '../../src/services/UserService';
+import { prisma } from '../../src/prisma';
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     user: {
       findUnique: jest.fn(),

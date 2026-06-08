@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { app } from '../src/server';
-import { prisma } from '../src/prisma';
+import { app } from '../../src/server';
+import { prisma } from '../../src/prisma';
 
 describe('Integração: API de Metas Financeiras (CRUD)', () => {
   let token: string;

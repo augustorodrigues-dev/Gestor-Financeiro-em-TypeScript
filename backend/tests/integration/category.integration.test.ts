@@ -1,5 +1,5 @@
 import request from 'supertest';
-import { app } from '../src/server';
+import { app } from '../../src/server';
 
 describe('Integração: API de Categorias', () => {
   let token: string;

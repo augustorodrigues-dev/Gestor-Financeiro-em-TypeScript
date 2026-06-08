@@ -1,7 +1,7 @@
-import { TransactionService } from '../src/services/TransactionService';
-import { prisma } from '../src/prisma'; 
+import { TransactionService } from '../../src/services/TransactionService';
+import { prisma } from '../../src/prisma'; 
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     $transaction: jest.fn(),
     transaction: {

@@ -1,7 +1,7 @@
-import { CreditCardService } from '../src/services/CreditCardService';
-import { prisma } from '../src/prisma';
+import { CreditCardService } from '../../src/services/CreditCardService';
+import { prisma } from '../../src/prisma';
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     creditCard: {
       create: jest.fn(),

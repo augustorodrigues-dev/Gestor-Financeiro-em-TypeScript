@@ -1,7 +1,7 @@
-import { CategoryService } from '../src/services/CategoryService';
-import { prisma } from '../src/prisma';
+import { CategoryService } from '../../src/services/CategoryService';
+import { prisma } from '../../src/prisma';
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     category: {
       create: jest.fn(),

@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { app } from '../src/server';
-import { prisma } from '../src/prisma';
+import { app } from '../../src/server';
+import { prisma } from '../../src/prisma';
 
 describe('Integração: CRUD de Usuários e Acessos', () => {
   let usuarioCriadoId: number;

@@ -5,13 +5,15 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel'; 
 import { GoalManager } from './components/GoalManager';
-import { CategoryManager } from './components/CategoryManager'; // 🚀 Importação da nova tela
+import { CategoryManager } from './components/CategoryManager'; 
+import { ReportView } from './components/ReportView'; // 🚀 Importação do novo relatório
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
   
-  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals' | 'categories'>('dashboard');
+  // 🚀 Atualizado o tipo do estado para aceitar 'reports'
+  const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals' | 'categories' | 'reports'>('dashboard');
 
   const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
     setUserSession({ id, name, role });
@@ -54,13 +56,20 @@ export default function App() {
                 }`}
               >🎯 Metas</button>
 
-              {}
               <button 
                 onClick={() => setCurrentView('categories')}
                 className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
                   currentView === 'categories' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
                 }`}
               >🏷️ Categorias</button>
+
+              {/* 🚀 NOVO BOTÃO INJETADO AQUI */}
+              <button 
+                onClick={() => setCurrentView('reports')}
+                className={`px-4 py-1.5 rounded text-sm font-semibold transition-colors ${
+                  currentView === 'reports' ? 'bg-white text-blue-700 shadow-sm' : 'text-blue-100 hover:text-white hover:bg-blue-600'
+                }`}
+              >📉 Relatórios</button>
             </div>
           )}
         </div>
@@ -81,7 +90,8 @@ export default function App() {
             currentView === 'dashboard' ? <Dashboard userNameSession={userSession.name} /> :
             currentView === 'wallet' ? <Wallet userId={userSession.id} /> :
             currentView === 'goals' ? <GoalManager /> :
-            <CategoryManager />
+            currentView === 'categories' ? <CategoryManager /> :
+            <ReportView /> // 🚀 Nova renderização condicional da View de Relatório
           )
         ) : authMode === 'login' ? (
           <Login onLoginSuccess={handleAuthSuccess} onNavigateToRegister={() => setAuthMode('register')} />

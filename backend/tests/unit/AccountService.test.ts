@@ -1,7 +1,7 @@
-import { AccountService } from '../src/services/AccountService';
-import { prisma } from '../src/prisma';
+import { AccountService } from '../../src/services/AccountService';
+import { prisma } from '../../src/prisma';
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     account: {
       create: jest.fn(),

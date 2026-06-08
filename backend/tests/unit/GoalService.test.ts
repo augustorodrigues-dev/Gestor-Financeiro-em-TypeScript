@@ -1,7 +1,7 @@
-import { GoalService } from '../src/services/GoalService';
-import { prisma } from '../src/prisma';
+import { GoalService } from '../../src/services/GoalService';
+import { prisma } from '../../src/prisma';
 
-jest.mock('../src/prisma', () => ({
+jest.mock('../../src/prisma', () => ({
   prisma: {
     goal: {
       create: jest.fn(),

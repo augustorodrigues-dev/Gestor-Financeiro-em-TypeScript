@@ -1,6 +1,6 @@
 import request from 'supertest';
-import { app } from '../src/server';
-import { prisma } from '../src/prisma';
+import { app } from '../../src/server';
+import { prisma } from '../../src/prisma';
 
 /**
  * Suíte focada em validações de entrada e tratamento de erros das camadas

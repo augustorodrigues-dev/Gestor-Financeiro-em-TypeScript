@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getBanks } from '../src/services/brasilApiService';
+import { getBanks } from '../../src/services/brasilApiService';
 
 jest.mock('axios');
 const mockedAxios = axios as jest.Mocked<typeof axios>;
