@@ -213,5 +213,3 @@ Projeto desenvolvido para a disciplina de **Qualidade de Software** (CESUPA).
 - Cauê Barroso
 - César Ribeiro
 - Fernando Fonseca
-
-> Caso algum nome precise de ajuste, edite esta seção.
