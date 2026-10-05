@@ -46,7 +46,7 @@ describe('Integração: API de Relatórios Financeiros', () => {
     expect(res.body).toHaveProperty('summary');
     expect(res.body).toHaveProperty('expenseByCategory');
     
-    // Validando os dados da resposta
+    
     expect(res.body.period.month).toBe(6);
     expect(res.body.period.year).toBe(2026);
     expect(typeof res.body.summary.totalIncome).toBe('number');

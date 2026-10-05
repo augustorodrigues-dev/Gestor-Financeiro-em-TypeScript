@@ -22,7 +22,7 @@ async createTransaction(data: {
         description: data.description,
         type: finalType,
         accountId: data.accountId,
-        categoryId: data.categoryId || null, // Se não vier nada, salva como null
+        categoryId: data.categoryId || null, 
         date: new Date(data.date),
         creditCardId: data.creditCardId ? Number(data.creditCardId) : null
       }

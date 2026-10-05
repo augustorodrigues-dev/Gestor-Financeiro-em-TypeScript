@@ -1,7 +1,7 @@
 import { ReportService } from '../../src/services/ReportService';
 import { prisma } from '../../src/prisma';
 
-// Isolando o Prisma para testar apenas a regra de negócio do relatório[cite: 2, 5]
+
 jest.mock('../../src/prisma', () => ({
   prisma: {
     transaction: {
@@ -14,7 +14,7 @@ describe('Testes Unitários: ReportService', () => {
   const reportService = new ReportService();
 
   beforeEach(() => {
-    jest.clearAllMocks(); // Limpa o histórico de chamadas antes de cada teste[cite: 2, 5]
+    jest.clearAllMocks(); 
   });
 
   it('1. Deve retornar zerado se não houver nenhuma transação no mês', async () => {
@@ -30,7 +30,7 @@ describe('Testes Unitários: ReportService', () => {
   });
 
   it('2. Deve somar receitas, despesas e calcular o saldo corretamente', async () => {
-    // Simulando o retorno do banco de dados
+    
     const mockTransactions = [
       { amount: 5000, type: 'INCOME' },
       { amount: 1500, type: 'EXPENSE', category: { name: 'Moradia', color: '#000' } },
@@ -43,7 +43,7 @@ describe('Testes Unitários: ReportService', () => {
 
     expect(result.summary.totalIncome).toBe(5000);
     expect(result.summary.totalExpense).toBe(2000);
-    expect(result.summary.balance).toBe(3000); // 5000 - 2000
+    expect(result.summary.balance).toBe(3000); 
   });
 
   it('3. Deve agrupar e ordenar os gastos por categoria do maior para o menor', async () => {
@@ -57,9 +57,9 @@ describe('Testes Unitários: ReportService', () => {
 
     const result = await reportService.getMonthlyReport(1, 6, 2026);
 
-    // Lazer total: 150. Alimentação total: 300.
+    
     expect(result.expenseByCategory).toHaveLength(2);
-    // Verifica a ordenação (o de 300 deve vir antes do de 150)
+    
     expect(result.expenseByCategory[0].name).toBe('Alimentação');
     expect(result.expenseByCategory[0].amount).toBe(300);
     expect(result.expenseByCategory[1].name).toBe('Lazer');

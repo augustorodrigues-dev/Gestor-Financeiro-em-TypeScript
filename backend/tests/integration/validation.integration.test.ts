@@ -2,11 +2,6 @@ import request from 'supertest';
 import { app } from '../../src/server';
 import { prisma } from '../../src/prisma';
 
-/**
- * Suíte focada em validações de entrada e tratamento de erros das camadas
- * Controller/Middleware (caminhos negativos), garantindo a cobertura dos
- * ramos de exceção (HTTP 400/401/403/404) exigidos pela estratégia de testes.
- */
 describe('Integração: Validações e Tratamento de Erros', () => {
   let token: string;
   let jadaoId: number;
@@ -20,7 +15,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     token = res.body.token;
     jadaoId = res.body.user.id;
 
-    // Cria uma categoria "do sistema" (isDefault) para validar a trava de exclusão.
+    
     const padrao = await prisma.category.create({
       data: { name: 'Sistema (Teste)', type: 'EXPENSE', isDefault: true, userId: jadaoId },
     });
@@ -32,7 +27,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     await prisma.$disconnect();
   });
 
-  // ---------------- Autenticação ----------------
+  
   it('Deve recusar token inválido com 401 (authMiddleware)', async () => {
     const res = await request(app)
       .get('/api/accounts')
@@ -40,7 +35,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     expect(res.status).toBe(401);
   });
 
-  // ---------------- Usuários (login) ----------------
+  
   it('Login: deve exigir e-mail e senha (400)', async () => {
     const res = await request(app).post('/api/users/login').send({ email: 'x@x.com' });
     expect(res.status).toBe(400);
@@ -62,7 +57,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     expect(res.status).toBe(401);
   });
 
-  // ---------------- Categorias ----------------
+  
   it('Categoria: deve recusar criação sem campos obrigatórios (400)', async () => {
     const res = await request(app)
       .post('/api/categories')
@@ -86,7 +81,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     expect(res.status).toBe(403);
   });
 
-  // ---------------- Metas ----------------
+  
   it('Meta: deve recusar criação sem campos obrigatórios (400)', async () => {
     const res = await request(app)
       .post('/api/goals')
@@ -110,7 +105,7 @@ describe('Integração: Validações e Tratamento de Erros', () => {
     expect(res.status).toBe(404);
   });
 
-  // ---------------- Transações ----------------
+  
   it('Transação: deve recusar criação sem campos obrigatórios (400)', async () => {
     const res = await request(app)
       .post('/api/transactions')

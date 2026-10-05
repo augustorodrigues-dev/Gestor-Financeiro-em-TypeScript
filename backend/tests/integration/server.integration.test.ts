@@ -15,7 +15,7 @@ describe('Integração: Endpoints do Servidor (Saldo Consolidado e API Externa)'
     token = registerRes.body.token;
     userId = registerRes.body.user.id;
 
-    // Cria duas contas com saldos conhecidos (100 + 50 = 150).
+    
     await request(app).post('/api/accounts').set('Authorization', `Bearer ${token}`)
       .send({ name: 'Conta A', type: 'CORRENTE', balance: 100 });
     await request(app).post('/api/accounts').set('Authorization', `Bearer ${token}`)
@@ -46,7 +46,7 @@ describe('Integração: Endpoints do Servidor (Saldo Consolidado e API Externa)'
   it('3. Deve consultar as instituições financeiras via Brasil API (integração externa)', async () => {
     const res = await request(app).get('/api/banks');
 
-    // Robusto a oscilações de rede: valida o contrato em ambos os caminhos.
+    
     if (res.status === 200) {
       expect(res.body.success).toBe(true);
       expect(Array.isArray(res.body.banks)).toBe(true);

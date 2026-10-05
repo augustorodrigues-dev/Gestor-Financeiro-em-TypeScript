@@ -72,7 +72,7 @@ export class CategoryService {
       throw new Error('Categorias padrão não podem ser removidas.');
     }
 
-    // Retorna o objeto deletado, permitindo que o teste acesse .id
+    
     return await prisma.category.delete({
       where: { id: categoryId },
     });

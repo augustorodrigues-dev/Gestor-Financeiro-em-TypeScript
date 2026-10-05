@@ -7,7 +7,7 @@ import userRoutes from './routes/user.routes';
 import creditCardRoutes from './routes/creditCard.routes';
 import goalRoutes from './routes/goal.routes';
 import categoryRoutes from './routes/category.routes';
-import reportRoutes from './routes/reportRoutes'; // 🚀 Importação das rotas de relatório
+import reportRoutes from './routes/reportRoutes';
 import { prisma } from './prisma'; 
 
 const app = express();
@@ -30,7 +30,7 @@ app.use('/api/users', userRoutes);
 app.use('/api/credit-cards', creditCardRoutes);
 app.use('/api/goals', goalRoutes);
 app.use('/api/categories', categoryRoutes); 
-app.use('/api', reportRoutes); // 🚀 Ativação do endpoint /api/reports
+app.use('/api', reportRoutes); 
 
 app.get('/api/balance/user/:userId', async (req, res) => {
   try {

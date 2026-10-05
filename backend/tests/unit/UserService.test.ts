@@ -8,7 +8,7 @@ jest.mock('../../src/prisma', () => ({
       create: jest.fn(),
       findMany: jest.fn(),
       update: jest.fn(),
-      delete: jest.fn(), // <--- Certifique-se de que este está aqui!
+      delete: jest.fn(), 
     },
     transaction: {
       deleteMany: jest.fn(),

@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 async function main() {
   console.log('🧹 Limpando o banco de dados (SQLite local)...');
 
-  // Remoção em ordem segura (respeitando as chaves estrangeiras).
   await prisma.transaction.deleteMany();
   await prisma.budget.deleteMany();
   await prisma.goal.deleteMany();

@@ -21,7 +21,7 @@ describe('Testes Unitários: brasilApiService (API Externa)', () => {
     const result = await getBanks();
 
     expect(mockedAxios.get).toHaveBeenCalledWith('https://brasilapi.com.br/api/banks/v1');
-    expect(result).toHaveLength(20); // slice(0, 20)
+    expect(result).toHaveLength(20); 
     expect(result.every((b: any) => b.code && b.name)).toBe(true);
   });
 

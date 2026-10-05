@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, deleteTransaction } from '../services/transactionService';
 import { goalService } from '../services/goalService';
-import { categoryService } from '../services/categoryService'; // 🚀 Importado
+import { categoryService } from '../services/categoryService'; 
 
 interface DashboardProps {
   userNameSession: string;
@@ -14,7 +14,7 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]); // 🚀 Estado para categorias
+  const [categories, setCategories] = useState<any[]>([]); 
   const [loadingData, setLoadingData] = useState(true);
 
   const loadDashboardData = useCallback(async () => {
@@ -30,7 +30,7 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
 
       setAccounts(Array.isArray(contas) ? contas : []);
       setTransactions(Array.isArray(transacoes) ? transacoes : []);
-      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []); // 🚀 Carregado
+      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []); 
       
       if (metas && !metas.error) {
         setGoals(Array.isArray(metas) ? metas : []);

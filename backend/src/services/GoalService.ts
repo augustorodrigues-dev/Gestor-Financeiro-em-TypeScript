@@ -48,7 +48,7 @@ export class GoalService {
   }
 
   async updateGoal(goalId: number, userId: number, data: UpdateGoalDTO) {
-    // Garante que a meta pertence ao usuário antes de atualizar
+    
     const existingGoal = await prisma.goal.findFirst({
       where: { id: goalId, userId },
     });

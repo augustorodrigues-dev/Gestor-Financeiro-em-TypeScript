@@ -55,7 +55,7 @@ export function ReportView() {
         <p className="text-gray-500 text-center py-6 font-medium">Buscando dados no servidor...</p>
       ) : report ? (
         <>
-          {/* Indicadores Consolidados */}
+          {}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-green-50 p-5 rounded-xl border border-green-200">
               <p className="text-green-800 text-xs font-bold uppercase tracking-wider">Total Receitas</p>
@@ -73,7 +73,7 @@ export function ReportView() {
             </div>
           </div>
 
-          {/* Listagem com Barras Proporcionais */}
+          {}
           <div className="pt-4">
             <h3 className="text-lg font-bold mb-4 text-gray-700">Gastos Proporcionais por Categoria</h3>
             
@@ -82,7 +82,7 @@ export function ReportView() {
             ) : (
               <div className="space-y-4">
                 {report.expenseByCategory.map((cat: any) => {
-                  // Calcula a porcentagem do gasto frente ao total de despesas
+                  
                   const totalExpense = report.summary.totalExpense || 1;
                   const percentage = Math.min(Math.round((cat.amount / totalExpense) * 100), 100);
                   

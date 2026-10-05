@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
-import jwt from 'jsonwebtoken'; // 🚀 IMPORTANTE: Para gerar o token do UC01
+import jwt from 'jsonwebtoken'; 
 import bcrypt from 'bcrypt';
 
 const userService = new UserService();
@@ -28,10 +28,10 @@ export class UserController {
       const token = jwt.sign(
         { id: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret_padrao_aqui',
-        { expiresIn: '1d' } // Expira em 1 dia
+        { expiresIn: '1d' } 
       );
 
-      // Retorna exatamente no formato que o Front-end espera
+      
       return res.json({
         token,
         user: {
@@ -61,15 +61,15 @@ export class UserController {
         role: role || 'USER' 
       });
 
-      // 🔐 PARA O UC02 (Início de sessão automático): 
-      // Vamos gerar um token direto no cadastro também para o usuário logar direto!
+      
+      
       const token = jwt.sign(
         { id: user.id, role: user.role },
         process.env.JWT_SECRET || 'secret_padrao_aqui',
         { expiresIn: '1d' }
       );
       
-      // Retornamos a mensagem, o usuário E o token
+      
       return res.status(201).json({ 
         message: "Usuário criado com sucesso!", 
         token, 

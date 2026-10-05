@@ -7,7 +7,7 @@ export function CategoryManager() {
   const [type, setType] = useState('EXPENSE');
   const [color, setColor] = useState('#3b82f6');
   
-  // 🚀 NOVO ESTADO: Controla qual categoria está sendo editada no momento
+  
   const [editingId, setEditingId] = useState<number | null>(null);
 
   useEffect(() => { loadCategories(); }, []);
@@ -16,7 +16,7 @@ export function CategoryManager() {
     categoryService.getCategories().then(setCategories);
   };
 
-  // 🚀 AJUSTADO: Agora ele cria OU edita, dependendo do estado 'editingId'
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -32,7 +32,7 @@ export function CategoryManager() {
     }
   };
 
-  // 🚀 NOVA FUNÇÃO: Joga os dados do card lá para cima no formulário
+  
   const handleEditClick = (cat: any) => {
     setEditingId(cat.id);
     setName(cat.name);
@@ -40,7 +40,7 @@ export function CategoryManager() {
     setColor(cat.color || '#3b82f6');
   };
 
-  // 🚀 NOVA FUNÇÃO: Limpa o formulário e sai do modo de edição
+  
   const resetForm = () => {
     setEditingId(null);
     setName('');

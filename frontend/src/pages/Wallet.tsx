@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { accountService } from '../services/accountService';
 import { createTransaction } from '../services/transactionService';
 import { creditCardService } from '../services/creditCardService';
-import { categoryService } from '../services/categoryService'; // 🚀 Importado
+import { categoryService } from '../services/categoryService'; 
 import CreditCardManager from '../components/CreditCardManager';
 
 interface Bank {
@@ -19,9 +19,8 @@ export default function Wallet({ userId }: WalletProps) {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [creditCards, setCreditCards] = useState<any[]>([]);
   const [officialBanks, setOfficialBanks] = useState<Bank[]>([]);
-  const [categories, setCategories] = useState<any[]>([]); // 🚀 Estado de categorias
+  const [categories, setCategories] = useState<any[]>([]); 
 
-  // Estados da Transação
   const [txDesc, setTxDesc] = useState('');
   const [txAmount, setTxAmount] = useState('');
   const [txType, setTxType] = useState('EXPENSE');

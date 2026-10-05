@@ -7,7 +7,7 @@ export class CreditCardController {
   
   async create(req: Request, res: Response) {
     try {
-      const { name, limitAmount, closingDay, dueDay } = req.body; // 🚀 Captura limitAmount
+      const { name, limitAmount, closingDay, dueDay } = req.body; 
       const userId = req.user.id;
 
       if (!name || !limitAmount || !closingDay || !dueDay) {

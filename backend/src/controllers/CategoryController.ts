@@ -59,7 +59,7 @@ export class CategoryController {
       return res.status(200).json(result);
     } catch (error: any) {
       if (error.message.includes('padrão não podem ser')) {
-        return res.status(403).json({ error: error.message }); // HTTP 403: Forbidden
+        return res.status(403).json({ error: error.message }); 
       }
       return res.status(404).json({ error: error.message });
     }

@@ -6,13 +6,13 @@ import Register from './pages/Register';
 import AdminPanel from './pages/AdminPanel'; 
 import { GoalManager } from './components/GoalManager';
 import { CategoryManager } from './components/CategoryManager'; 
-import { ReportView } from './components/ReportView'; // 🚀 Importação do novo relatório
+import { ReportView } from './components/ReportView'; 
 
 export default function App() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [userSession, setUserSession] = useState<{ id: number; name: string; role: string } | null>(null);
   
-  // 🚀 Atualizado o tipo do estado para aceitar 'reports'
+  
   const [currentView, setCurrentView] = useState<'dashboard' | 'wallet' | 'goals' | 'categories' | 'reports'>('dashboard');
 
   const handleAuthSuccess = (id: number, name: string, role: string = 'USER') => {
@@ -91,7 +91,7 @@ export default function App() {
             currentView === 'wallet' ? <Wallet userId={userSession.id} /> :
             currentView === 'goals' ? <GoalManager /> :
             currentView === 'categories' ? <CategoryManager /> :
-            <ReportView /> // 🚀 Nova renderização condicional da View de Relatório
+            <ReportView /> 
           )
         ) : authMode === 'login' ? (
           <Login onLoginSuccess={handleAuthSuccess} onNavigateToRegister={() => setAuthMode('register')} />

@@ -7,7 +7,7 @@ export class TransactionController {
   
   async create(req: Request, res: Response) {
     try {
-      // 🚀 1. Adicionamos o creditCardId aqui para ele ser extraído da requisição HTTP
+      
       const { description, amount, type, accountId, date, creditCardId } = req.body;
 
       if (!description || !amount || !type || !accountId || !date) {
@@ -20,7 +20,7 @@ export class TransactionController {
         type,
         accountId: Number(accountId),
         date,
-        creditCardId: creditCardId ? Number(creditCardId) : null // 🚀 2. Repassamos para o Service
+        creditCardId: creditCardId ? Number(creditCardId) : null 
       });
 
       return res.status(201).json(transaction);
@@ -31,7 +31,7 @@ export class TransactionController {
 
   async list(req: Request, res: Response) {
     try {
-      const userId = req.user.id; // Vem do authMiddleware
+      const userId = req.user.id; 
       
       const transactions = await transactionService.getTransactionsByUser(userId);
       
@@ -45,7 +45,7 @@ export class TransactionController {
     try {
       const id = parseInt(req.params.id);
       
-      // 🚀 3. Garantimos que o update também repasse o creditCardId
+      
       const transaction = await transactionService.updateTransaction(id, req.body);
       
       return res.status(200).json(transaction);

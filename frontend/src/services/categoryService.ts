@@ -8,7 +8,6 @@ export const categoryService = {
     method: 'POST', headers: getHeaders(), body: JSON.stringify(data) 
   }).then(res => res.json()),
 
-  // 🚀 NOVA FUNÇÃO ADICIONADA:
   updateCategory: async (id: number, data: any) => {
     const res = await fetch(`${API_URL}/${id}`, { 
       method: 'PUT', headers: getHeaders(), body: JSON.stringify(data) 

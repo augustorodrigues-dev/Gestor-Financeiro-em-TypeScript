@@ -10,7 +10,7 @@ export class GoalController {
 
   async create(req: Request, res: Response) {
     try {
-      const userId = req.user.id; // Assumindo que o authMiddleware injeta o usuário
+      const userId = req.user.id; 
       const { name, targetAmount, deadline } = req.body;
 
       if (!name || !targetAmount || !deadline) {

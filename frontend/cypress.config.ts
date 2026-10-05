@@ -1,8 +1,6 @@
 import { defineConfig } from "cypress";
 
 export default defineConfig({
-  // Desativa o acesso a Cypress.env() pelo código do navegador (boa prática de segurança;
-  // também silencia o aviso do Cypress 15).
   allowCypressEnv: false,
 
   e2e: {
@@ -12,7 +10,6 @@ export default defineConfig({
     defaultCommandTimeout: 8000,
     video: false,
     setupNodeEvents(_on, config) {
-      // Local para registrar plugins/eventos de node, se necessário.
       return config;
     },
   },

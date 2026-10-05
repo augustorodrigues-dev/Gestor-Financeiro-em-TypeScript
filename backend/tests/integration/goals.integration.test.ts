@@ -25,7 +25,7 @@ describe('Integração: API de Metas Financeiras (CRUD)', () => {
   });
 
   afterAll(async () => {
-    // 2. Limpeza do banco de dados (Teardown)
+    
     await prisma.goal.deleteMany({ where: { userId: testUserId } });
     await prisma.user.delete({ where: { id: testUserId } });
   });
