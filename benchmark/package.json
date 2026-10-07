@@ -1,0 +1,16 @@
+{
+  "name": "benchmark-isaac",
+  "private": true,
+  "scripts": {
+    "bench:memoria": "tsx --expose-gc bench-memoria.ts",
+    "bench:memoria:rapido": "cross-env N_MAX=10000 tsx --expose-gc bench-memoria.ts",
+    "bench:db": "tsx --expose-gc bench-db.ts",
+    "bench:db:rapido": "cross-env N_MAX=10000 tsx --expose-gc bench-db.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "cross-env": "^7.0.3",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  }
+}
