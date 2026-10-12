@@ -69,19 +69,19 @@ export class CreditCardService {
     });
   }
 
-  async deleteCard(id: number) {
-    const card = await prisma.creditCard.findUnique({
+  async deleteCard(id: number, db: ClienteCartao = prisma) {
+    const card = await db.creditCard.findUnique({
       where: { id },
-      include: { transactions: true }
+      select: { _count: { select: { transactions: true } } }
     });
 
     if (!card) throw new Error("Cartão não encontrado.");
 
-    if (card.transactions.length > 0) {
+    if (card._count.transactions > 0) {
       throw new Error("Não é possível excluir um cartão com faturas pendentes ou histórico ativo.");
     }
 
-    return await prisma.creditCard.delete({
+    return await db.creditCard.delete({
       where: { id }
     });
   }
