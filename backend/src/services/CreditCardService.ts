@@ -1,5 +1,7 @@
 import { prisma } from '../prisma';
 
+type ClienteCartao = Pick<typeof prisma, 'creditCard' | '$queryRaw'>;
+
 export class CreditCardService {
   
   async createCard(data: { name: string; limitAmount: number; closingDay: number; dueDay: number; userId: number }) {
@@ -14,20 +16,34 @@ export class CreditCardService {
     });
   }
 
-  async getCardsByUser(userId: number) {
-    const cards = await prisma.creditCard.findMany({
-      where: { userId },
-      include: {
-        transactions: true 
-      }
+  async getCardsByUser(userId: number, db: ClienteCartao = prisma) {
+    const cards = await db.creditCard.findMany({
+      where: { userId }
     });
+
+    if (cards.length === 0) {
+      return [];
+    }
+
+    const grupos = await db.$queryRaw<{ creditCardId: number | bigint; soma: string | null }[]>`
+      SELECT t.creditcard_id AS creditCardId, CAST(SUM(t.amount) AS TEXT) AS soma
+      FROM transacao t
+      JOIN cartaocredito c ON c.creditcard_id = t.creditcard_id
+      WHERE c.user_id = ${userId}
+      GROUP BY t.creditcard_id
+    `;
+
+    const faturaPorCartao = new Map<number, number>();
+    for (const grupo of grupos) {
+      faturaPorCartao.set(Number(grupo.creditCardId), Number(grupo.soma ?? 0));
+    }
 
     return cards.map(card => {
       const limiteTotal = Number(card.limitAmount);
-      
-      const currentInvoice = card.transactions.reduce((acc, tx) => acc + Number(tx.amount), 0);
+
+      const currentInvoice = faturaPorCartao.get(card.id) ?? 0;
       const availableLimit = limiteTotal - currentInvoice;
-      
+
       return {
         id: card.id,
         name: card.name,
@@ -53,19 +69,19 @@ export class CreditCardService {
     });
   }
 
-  async deleteCard(id: number) {
-    const card = await prisma.creditCard.findUnique({
+  async deleteCard(id: number, db: ClienteCartao = prisma) {
+    const card = await db.creditCard.findUnique({
       where: { id },
-      include: { transactions: true }
+      select: { _count: { select: { transactions: true } } }
     });
 
     if (!card) throw new Error("Cartão não encontrado.");
 
-    if (card.transactions.length > 0) {
+    if (card._count.transactions > 0) {
       throw new Error("Não é possível excluir um cartão com faturas pendentes ou histórico ativo.");
     }
 
-    return await prisma.creditCard.delete({
+    return await db.creditCard.delete({
       where: { id }
     });
   }

@@ -48,7 +48,6 @@ export class GoalService {
   }
 
   async updateGoal(goalId: number, userId: number, data: UpdateGoalDTO) {
-    
     const existingGoal = await prisma.goal.findFirst({
       where: { id: goalId, userId },
     });
