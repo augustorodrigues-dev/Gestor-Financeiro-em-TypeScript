@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { accountService } from '../services/accountService';
 import { getTransactions, deleteTransaction } from '../services/transactionService';
 import { goalService } from '../services/goalService';
-import { categoryService } from '../services/categoryService'; 
+import { categoryService } from '../services/categoryService';
 
 interface DashboardProps {
   userNameSession: string;
@@ -14,13 +14,13 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
   const [accounts, setAccounts] = useState<any[]>([]);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [goals, setGoals] = useState<any[]>([]);
-  const [categories, setCategories] = useState<any[]>([]); 
+  const [categories, setCategories] = useState<any[]>([]);
   const [loadingData, setLoadingData] = useState(true);
 
   const loadDashboardData = useCallback(async () => {
     try {
       setLoadingData(true);
-      
+
       const [contas, transacoes, metas, listaCategorias] = await Promise.all([
         accountService.getUserAccounts(),
         getTransactions(),
@@ -30,12 +30,12 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
 
       setAccounts(Array.isArray(contas) ? contas : []);
       setTransactions(Array.isArray(transacoes) ? transacoes : []);
-      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []); 
-      
+      setCategories(Array.isArray(listaCategorias) ? listaCategorias : []);
+
       if (metas && !metas.error) {
         setGoals(Array.isArray(metas) ? metas : []);
       }
-      
+
       const listaContas = Array.isArray(contas) ? contas : [];
       const saldoCalculado = listaContas.reduce((acc, conta) => acc + Number(conta.balance), 0);
       setBalance(saldoCalculado);
@@ -62,7 +62,7 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
 
   return (
     <div className="mx-auto max-w-6xl space-y-6 animate-fade-in p-6">
-      
+
       <div className="rounded-2xl bg-gradient-brand p-8 text-white shadow-soft">
         <h1 className="text-3xl font-bold">👋 Bem-vindo de volta, <span className="text-yellow-300">{userName}</span>!</h1>
         <p className="mt-2 text-brand-100">Aqui está o resumo financeiro das suas contas e despesas do mês.</p>
@@ -81,7 +81,7 @@ export default function Dashboard({ userNameSession }: DashboardProps) {
             <h3 className="font-bold text-neutral-800">🎯 Progresso das Metas</h3>
             <span className="text-sm font-medium text-blue-600">Top 3 ativas</span>
           </div>
-          
+
           {goals.length === 0 ? (
             <p className="text-sm text-neutral-500 py-4 text-center">Nenhuma meta ativa no momento.</p>
           ) : (
