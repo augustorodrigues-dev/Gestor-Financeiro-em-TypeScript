@@ -1,5 +1,4 @@
 import { prisma } from '../prisma';
-import { calcularProgressoMetas } from '../utils/metas';
 
 interface CreateGoalDTO {
   name: string;
@@ -33,7 +32,19 @@ export class GoalService {
       orderBy: { deadline: 'asc' },
     });
 
-    return calcularProgressoMetas(goals);
+    return goals.map(goal => {
+      const target = Number(goal.targetAmount);
+      const current = Number(goal.currentAmount);
+      const progressPercentage = target > 0 ? (current / target) * 100 : 0;
+
+      return {
+        ...goal,
+        targetAmount: target,
+        currentAmount: current,
+        progressPercentage: parseFloat(progressPercentage.toFixed(2)),
+        isCompleted: current >= target
+      };
+    });
   }
 
   async updateGoal(goalId: number, userId: number, data: UpdateGoalDTO) {
